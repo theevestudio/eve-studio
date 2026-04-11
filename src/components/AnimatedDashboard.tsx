@@ -104,7 +104,7 @@ export default function AnimatedDashboard() {
   }, [])
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden" style={{height: 420}}>
       {/* Top bar */}
       <div className="border-b border-zinc-800 px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -116,9 +116,9 @@ export default function AnimatedDashboard() {
         <div className="w-16" />
       </div>
 
-      <div className="p-6">
+      <div className="p-6 flex flex-col" style={{height: 372}}>
         {/* Client selector */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${phase === 'generating' ? 'bg-violet-400 animate-pulse' : 'bg-emerald-400'}`} />
             <div>
@@ -136,19 +136,19 @@ export default function AnimatedDashboard() {
           </span>
         </div>
 
-        {/* Custom prompt (shown when applicable) */}
-        {(phase === 'typing-prompt' || (typedPrompt && phase === 'generating')) && (
-          <div className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 mb-4 flex items-center gap-2">
+        {/* Custom prompt — always reserves space, fades in/out */}
+        <div className="shrink-0 mb-3" style={{height: 44}}>
+          <div className={`bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 flex items-center gap-2 transition-opacity duration-300 ${(phase === 'typing-prompt' || (typedPrompt && phase === 'generating')) ? 'opacity-100' : 'opacity-0'}`}>
             <span className="text-violet-400 text-xs font-semibold shrink-0">Custom:</span>
-            <span className="text-zinc-300 text-xs font-mono">
+            <span className="text-zinc-300 text-xs font-mono truncate">
               {typedPrompt}
               {phase === 'typing-prompt' && <span className="animate-pulse">|</span>}
             </span>
           </div>
-        )}
+        </div>
 
-        {/* Script output */}
-        <div className={`bg-violet-950/30 border border-violet-800/60 rounded-xl p-5 transition-all duration-500 ${phase === 'switching' ? 'opacity-0' : 'opacity-100'}`}>
+        {/* Script output — fixed height, content fades at bottom */}
+        <div className={`relative flex-1 bg-violet-950/30 border border-violet-800/60 rounded-xl p-5 overflow-hidden transition-opacity duration-500 ${phase === 'switching' ? 'opacity-0' : 'opacity-100'}`}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-violet-400 font-semibold uppercase tracking-widest">
               {phase === 'generating' ? 'VIBE is writing...' : 'Generated script — Hook'}
@@ -165,7 +165,7 @@ export default function AnimatedDashboard() {
             </div>
           ) : (
             <>
-              <p className="text-white font-semibold text-base leading-relaxed min-h-[48px]">
+              <p className="text-white font-semibold text-base leading-relaxed">
                 {typedHook}
                 {typedHook.length < scenario.script.hook.length && <span className="animate-pulse">|</span>}
               </p>
@@ -175,18 +175,20 @@ export default function AnimatedDashboard() {
                   <p key={i} className="text-zinc-400 text-sm">{line}</p>
                 ))}
                 <p className="text-zinc-300 text-sm font-medium mt-2">{scenario.script.cta}</p>
-              </div>
-
-              <div className={`flex items-center gap-3 mt-4 pt-3 border-t border-violet-800/40 transition-all duration-700 ${showBody ? 'opacity-100' : 'opacity-0'}`}>
-                <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">{scenario.script.hookType}</span>
-                <span className="text-xs text-zinc-600">Est. {scenario.script.duration}</span>
+                <div className="flex items-center gap-3 pt-3 border-t border-violet-800/40">
+                  <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">{scenario.script.hookType}</span>
+                  <span className="text-xs text-zinc-600">Est. {scenario.script.duration}</span>
+                </div>
               </div>
             </>
           )}
+
+          {/* Fade out at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 rounded-b-xl pointer-events-none" style={{background: 'linear-gradient(to top, rgb(24,24,27), transparent)'}} />
         </div>
 
         {/* Progress dots */}
-        <div className="flex justify-center gap-2 mt-5">
+        <div className="flex justify-center gap-2 mt-4 shrink-0">
           {SCENARIOS.map((_, i) => (
             <div
               key={i}
