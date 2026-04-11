@@ -125,15 +125,15 @@ export default function EVEChat() {
       {/* Toggle button — fixed bottom-left */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 hover:border-violet-500 transition shadow-lg flex items-center justify-center"
+        className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-zinc-900 border border-zinc-700 hover:border-violet-500 transition shadow-lg flex items-center justify-center overflow-hidden"
         title="Ask E.V.E."
       >
         <Image
           src="/logo-icon.png"
           alt="Ask E.V.E."
-          width={32}
-          height={32}
-          className={`rounded-full transition-all duration-300 ${open ? 'opacity-50' : 'opacity-100'}`}
+          width={80}
+          height={80}
+          className={`transition-all duration-300 ${open ? 'opacity-50' : 'opacity-100'}`}
         />
       </button>
     </>
