@@ -13,6 +13,7 @@ export default function ScriptsPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<any>(null)
   const [saving, setSaving] = useState(false)
+  const [enhancing, setEnhancing] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -62,6 +63,22 @@ export default function ScriptsPage() {
     }
   }
 
+  async function handleEnhance(script: Script) {
+    setEnhancing(script.id)
+    const res = await fetch('/api/scripts/enhance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ script_id: script.id }),
+    })
+    const data = await res.json()
+    if (res.ok && data.script) {
+      setScripts(prev => prev.map(s => s.id === script.id ? data.script : s))
+    } else {
+      alert(data.error || 'Enhancement failed')
+    }
+    setEnhancing(null)
+  }
+
   if (loading) return <Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>
 
   return (
@@ -69,31 +86,48 @@ export default function ScriptsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold">Scripts</h1>
-          <p className="text-zinc-500 text-sm mt-1">{scripts.length} script{scripts.length !== 1 ? 's' : ''} generated</p>
+          <p className="text-zinc-500 text-sm mt-1">{scripts.length} script{scripts.length !== 1 ? 's' : ''}</p>
         </div>
-        <button
-          onClick={() => router.push('/dashboard/vibe')}
-          className="bg-violet-600 hover:bg-violet-500 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
-        >
-          + Generate more
-        </button>
-      </div>
-
-      {scripts.length === 0 ? (
-        <div className="border border-dashed border-zinc-800 rounded-xl p-12 text-center">
-          <p className="text-zinc-500 mb-4">No scripts yet. Run VIBE to generate your first batch.</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => router.push('/dashboard/scripts/import')}
+            className="border border-zinc-700 hover:border-violet-500 transition text-zinc-400 hover:text-white text-sm font-semibold px-4 py-2 rounded-lg"
+          >
+            Import script
+          </button>
           <button
             onClick={() => router.push('/dashboard/vibe')}
             className="bg-violet-600 hover:bg-violet-500 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
           >
-            Go to VIBE
+            + Generate with VIBE
           </button>
+        </div>
+      </div>
+
+      {scripts.length === 0 ? (
+        <div className="border border-dashed border-zinc-800 rounded-xl p-12 text-center">
+          <p className="text-zinc-500 mb-6">No scripts yet.</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => router.push('/dashboard/vibe')}
+              className="bg-violet-600 hover:bg-violet-500 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
+            >
+              Generate with VIBE
+            </button>
+            <button
+              onClick={() => router.push('/dashboard/scripts/import')}
+              className="border border-zinc-700 hover:border-zinc-500 transition text-zinc-400 hover:text-white text-sm font-semibold px-4 py-2 rounded-lg"
+            >
+              Import a script
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
           {scripts.map(script => {
             const isExpanded = expandedId === script.id
             const isEditing = editingId === script.id
+            const isImported = script.source === 'imported'
             const content = isEditing ? editDraft : script.script_content
             const theme = script.theme_id ? themes[script.theme_id] : null
 
@@ -106,7 +140,14 @@ export default function ScriptsPage() {
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div>
-                      <p className="font-semibold text-sm truncate">{script.title || 'Untitled script'}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm truncate">{script.title || 'Untitled script'}</p>
+                        {isImported && (
+                          <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800/50 px-2 py-0.5 rounded-full shrink-0">
+                            Imported
+                          </span>
+                        )}
+                      </div>
                       <p className="text-zinc-500 text-xs mt-0.5">
                         {theme?.client_name && <span>{theme.client_name} · </span>}
                         {new Date(script.created_at).toLocaleDateString()}
@@ -127,102 +168,126 @@ export default function ScriptsPage() {
                 </div>
 
                 {/* Expanded content */}
-                {isExpanded && content && (
+                {isExpanded && (
                   <div className="border-t border-zinc-800 px-5 py-5 space-y-4">
-                    {isEditing ? (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-xs text-zinc-500 uppercase tracking-wide block mb-1">Hook</label>
-                          <textarea
-                            value={editDraft.hook}
-                            onChange={e => setEditDraft((d: any) => ({ ...d, hook: e.target.value }))}
-                            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 resize-none"
-                            rows={2}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs text-zinc-500 uppercase tracking-wide block mb-1">Body</label>
-                          <textarea
-                            value={editDraft.body?.join('\n')}
-                            onChange={e => setEditDraft((d: any) => ({ ...d, body: e.target.value.split('\n') }))}
-                            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 resize-none"
-                            rows={6}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs text-zinc-500 uppercase tracking-wide block mb-1">CTA</label>
-                          <textarea
-                            value={editDraft.cta}
-                            onChange={e => setEditDraft((d: any) => ({ ...d, cta: e.target.value }))}
-                            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 resize-none"
-                            rows={2}
-                          />
-                        </div>
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => handleSaveEdit(script)}
-                            disabled={saving}
-                            className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
-                          >
-                            {saving ? 'Saving...' : 'Save'}
-                          </button>
-                          <button
-                            onClick={() => { setEditingId(null); setEditDraft(null) }}
-                            className="text-zinc-400 hover:text-white transition text-sm px-3 py-2"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div>
-                          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">Hook</p>
-                          <p className="text-white font-medium">{content.hook}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">Body</p>
-                          <div className="space-y-1">
-                            {content.body?.map((line: string, i: number) => (
-                              <p key={i} className="text-zinc-300 text-sm">{line}</p>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">CTA</p>
-                          <p className="text-white text-sm">{content.cta}</p>
-                        </div>
-                        {content.b_roll_notes?.length > 0 && (
-                          <div>
-                            <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">B-roll notes</p>
-                            <ul className="text-zinc-400 text-xs space-y-0.5">
-                              {content.b_roll_notes.map((note: string, i: number) => (
-                                <li key={i}>· {note}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {content.duration_estimate && (
-                          <p className="text-xs text-zinc-600">Est. duration: {content.duration_estimate}</p>
-                        )}
 
-                        <div className="flex gap-3 pt-2 border-t border-zinc-800">
-                          <button
-                            onClick={() => { setEditingId(script.id); setEditDraft({ ...script.script_content }) }}
-                            className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
-                          >
-                            Edit
-                          </button>
-                          {script.is_edited && (
+                    {/* Imported warning */}
+                    {isImported && (
+                      <div className="bg-amber-950/30 border border-amber-800/50 rounded-lg px-4 py-3">
+                        <p className="text-amber-400 text-xs font-semibold mb-0.5">Imported script</p>
+                        <p className="text-amber-200/70 text-xs leading-relaxed">
+                          This script was imported and may not be fully structured for E.V.E. Use Enhance with VIBE to optimize it for best results in Premiere Pro.
+                        </p>
+                      </div>
+                    )}
+
+                    {content ? (
+                      isEditing ? (
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-xs text-zinc-500 uppercase tracking-wide block mb-1">Hook</label>
+                            <textarea
+                              value={editDraft.hook}
+                              onChange={e => setEditDraft((d: any) => ({ ...d, hook: e.target.value }))}
+                              className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 resize-none"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-zinc-500 uppercase tracking-wide block mb-1">Body</label>
+                            <textarea
+                              value={editDraft.body?.join('\n')}
+                              onChange={e => setEditDraft((d: any) => ({ ...d, body: e.target.value.split('\n') }))}
+                              className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 resize-none"
+                              rows={6}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-zinc-500 uppercase tracking-wide block mb-1">CTA</label>
+                            <textarea
+                              value={editDraft.cta}
+                              onChange={e => setEditDraft((d: any) => ({ ...d, cta: e.target.value }))}
+                              className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 resize-none"
+                              rows={2}
+                            />
+                          </div>
+                          <div className="flex gap-3">
                             <button
-                              onClick={() => handleRestore(script)}
-                              className="text-sm text-violet-400 hover:text-violet-300 transition border border-violet-800 hover:border-violet-600 px-3 py-1.5 rounded-lg"
+                              onClick={() => handleSaveEdit(script)}
+                              disabled={saving}
+                              className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
                             >
-                              Restore original
+                              {saving ? 'Saving...' : 'Save'}
                             </button>
-                          )}
+                            <button
+                              onClick={() => { setEditingId(null); setEditDraft(null) }}
+                              className="text-zinc-400 hover:text-white transition text-sm px-3 py-2"
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         </div>
-                      </>
+                      ) : (
+                        <>
+                          <div>
+                            <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">Hook</p>
+                            <p className="text-white font-medium">{content.hook}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">Body</p>
+                            <div className="space-y-1">
+                              {content.body?.map((line: string, i: number) => (
+                                <p key={i} className="text-zinc-300 text-sm">{line}</p>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">CTA</p>
+                            <p className="text-white text-sm">{content.cta}</p>
+                          </div>
+                          {content.b_roll_notes?.length > 0 && (
+                            <div>
+                              <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">B-roll notes</p>
+                              <ul className="text-zinc-400 text-xs space-y-0.5">
+                                {content.b_roll_notes.map((note: string, i: number) => (
+                                  <li key={i}>· {note}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {content.duration_estimate && (
+                            <p className="text-xs text-zinc-600">Est. duration: {content.duration_estimate}</p>
+                          )}
+
+                          <div className="flex flex-wrap gap-3 pt-2 border-t border-zinc-800">
+                            <button
+                              onClick={() => { setEditingId(script.id); setEditDraft({ ...script.script_content }) }}
+                              className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
+                            >
+                              Edit
+                            </button>
+                            {script.is_edited && (
+                              <button
+                                onClick={() => handleRestore(script)}
+                                className="text-sm text-violet-400 hover:text-violet-300 transition border border-violet-800 hover:border-violet-600 px-3 py-1.5 rounded-lg"
+                              >
+                                Restore original
+                              </button>
+                            )}
+                            {isImported && (
+                              <button
+                                onClick={() => handleEnhance(script)}
+                                disabled={enhancing === script.id}
+                                className="text-sm text-violet-300 hover:text-white transition bg-violet-600 hover:bg-violet-500 disabled:opacity-50 px-3 py-1.5 rounded-lg font-semibold"
+                              >
+                                {enhancing === script.id ? 'Enhancing...' : '✦ Enhance with VIBE — 1 token'}
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )
+                    ) : (
+                      <p className="text-zinc-500 text-sm">No content available.</p>
                     )}
                   </div>
                 )}

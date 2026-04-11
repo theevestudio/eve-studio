@@ -1,0 +1,141 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
+
+type Message = { role: 'user' | 'assistant'; content: string }
+
+export default function EVEChat() {
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: "Hey! I'm E.V.E. — ask me anything about the platform, your workflow, or how to get the most out of VIBE and the Premiere plugin." }
+  ])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (open) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+      inputRef.current?.focus()
+    }
+  }, [open, messages])
+
+  async function send() {
+    const text = input.trim()
+    if (!text || loading) return
+
+    const newMessages: Message[] = [...messages, { role: 'user', content: text }]
+    setMessages(newMessages)
+    setInput('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || data.error || 'Something went wrong.' }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error — please try again.' }])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleKey(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
+  }
+
+  return (
+    <>
+      {/* Chat window */}
+      {open && (
+        <div className="fixed bottom-20 left-4 z-50 w-80 sm:w-96 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+          style={{ maxHeight: '500px' }}>
+
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-950">
+            <Image src="/logo-icon.png" alt="E.V.E." width={28} height={28} className="rounded-full" />
+            <div>
+              <p className="text-sm font-bold">E.V.E.</p>
+              <p className="text-xs text-zinc-500">AI Assistant · always here to help</p>
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              className="ml-auto text-zinc-600 hover:text-white transition text-lg leading-none"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-violet-600 text-white rounded-br-sm'
+                    : 'bg-zinc-800 text-zinc-200 rounded-bl-sm'
+                }`}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5">
+                  <div className="flex gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Input */}
+          <div className="px-3 py-3 border-t border-zinc-800 flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              placeholder="Ask E.V.E. anything..."
+              disabled={loading}
+              className="flex-1 bg-zinc-800 border border-zinc-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-violet-500 transition placeholder-zinc-600 disabled:opacity-50"
+            />
+            <button
+              onClick={send}
+              disabled={!input.trim() || loading}
+              className="bg-violet-600 hover:bg-violet-500 disabled:opacity-40 transition text-white rounded-xl px-3 py-2 text-sm font-bold"
+            >
+              ↑
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Toggle button — fixed bottom-left */}
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 hover:border-violet-500 transition shadow-lg flex items-center justify-center"
+        title="Ask E.V.E."
+      >
+        <Image
+          src="/logo-icon.png"
+          alt="Ask E.V.E."
+          width={32}
+          height={32}
+          className={`rounded-full transition-all duration-300 ${open ? 'opacity-50' : 'opacity-100'}`}
+        />
+      </button>
+    </>
+  )
+}

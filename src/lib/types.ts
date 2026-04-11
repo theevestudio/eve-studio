@@ -63,6 +63,8 @@ export type Script = {
   is_new: boolean
   batch_id: string | null
   token_cost: number
+  source: 'vibe' | 'imported' | null
+  raw_text: string | null
   created_at: string
   updated_at: string
 }
