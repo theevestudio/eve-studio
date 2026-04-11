@@ -2,12 +2,93 @@
 
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import AnimatedDashboard from '@/components/AnimatedDashboard'
 
 export default function LandingPage() {
   const router = useRouter()
 
   return (
     <div className="min-h-screen bg-black text-white">
+
+      <style>{`
+        /* Robot glow pulse */
+        @keyframes eve-pulse {
+          0%, 100% {
+            filter:
+              drop-shadow(0 0 30px rgba(139,92,246,0.7))
+              drop-shadow(0 0 70px rgba(124,58,237,0.4))
+              drop-shadow(0 0 120px rgba(109,40,217,0.2));
+          }
+          50% {
+            filter:
+              drop-shadow(0 0 60px rgba(167,139,250,1))
+              drop-shadow(0 0 120px rgba(139,92,246,0.7))
+              drop-shadow(0 0 200px rgba(124,58,237,0.4));
+          }
+        }
+
+        /* Silky vertical flows */
+        @keyframes silk-rise {
+          0%   { transform: translateY(100%); opacity: 0; }
+          15%  { opacity: 1; }
+          85%  { opacity: 1; }
+          100% { transform: translateY(-100%); opacity: 0; }
+        }
+
+        /* CTA shimmer */
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+
+        .eve-pulse { animation: eve-pulse 2.5s ease-in-out infinite; }
+
+        .cta-primary {
+          background: linear-gradient(
+            90deg,
+            #7c3aed 0%,
+            #8b5cf6 40%,
+            #a78bfa 50%,
+            #8b5cf6 60%,
+            #7c3aed 100%
+          );
+          background-size: 200% auto;
+          animation: shimmer 3s linear infinite;
+          box-shadow: 0 0 24px rgba(124,58,237,0.5), 0 0 60px rgba(124,58,237,0.2);
+          transition: box-shadow 0.3s;
+        }
+
+        .cta-primary:hover {
+          box-shadow: 0 0 36px rgba(139,92,246,0.7), 0 0 80px rgba(124,58,237,0.35);
+        }
+
+        .silk-wrap {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .silk {
+          position: absolute;
+          bottom: 0;
+          width: 1px;
+          height: 60%;
+          background: linear-gradient(to top, transparent, rgba(139,92,246,0.6), rgba(167,139,250,0.8), rgba(139,92,246,0.6), transparent);
+          animation: silk-rise linear infinite;
+          filter: blur(0.5px);
+        }
+
+        .silk-wide {
+          position: absolute;
+          bottom: 0;
+          width: 3px;
+          height: 45%;
+          background: linear-gradient(to top, transparent, rgba(124,58,237,0.25), rgba(139,92,246,0.35), rgba(124,58,237,0.25), transparent);
+          animation: silk-rise linear infinite;
+          filter: blur(2px);
+        }
+      `}</style>
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 border-b border-zinc-900" style={{height: 100}}>
@@ -33,7 +114,7 @@ export default function LandingPage() {
           </button>
           <button
             onClick={() => router.push('/auth/signup')}
-            className="bg-violet-600 hover:bg-violet-500 transition text-white text-lg font-semibold px-6 py-3 rounded-lg"
+            className="cta-primary text-white text-lg font-bold px-6 py-3 rounded-lg"
           >
             Get started free
           </button>
@@ -41,74 +122,60 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
-        <h1 className="text-6xl font-bold leading-tight tracking-tight mb-2">
+      <section className="relative max-w-4xl mx-auto px-6 pt-24 pb-20 text-center overflow-visible">
+
+        <h1 className="text-6xl font-bold leading-tight tracking-tight mb-2 relative z-10">
           Introducing E.V.E.
         </h1>
-        <p className="text-zinc-500 text-xl font-medium mb-1 tracking-wide">(Script. Film. Edit. Repeat.)</p>
+        <p className="text-zinc-500 text-xl font-medium mb-1 tracking-wide relative z-10">(Script. Film. Edit. Repeat.)</p>
 
-        <div className="flex justify-center" style={{marginTop: '-80px', marginBottom: '-80px'}}>
-          <div style={{
-            animation: 'eve-pulse 3s ease-in-out infinite',
-            borderRadius: '50%',
-          }}>
+        {/* Robot + silky background */}
+        <div className="relative flex justify-center" style={{marginTop: '-80px', marginBottom: '-80px'}}>
+          {/* Silk background */}
+          <div className="silk-wrap" style={{width: 440, height: 440, left: '50%', transform: 'translateX(-50%)', borderRadius: '50%'}}>
+            <div className="silk" style={{left:'15%', animationDuration:'6s', animationDelay:'0s', height:'55%'}} />
+            <div className="silk" style={{left:'25%', animationDuration:'8s', animationDelay:'1.5s', height:'70%'}} />
+            <div className="silk" style={{left:'38%', animationDuration:'7s', animationDelay:'0.8s', height:'60%'}} />
+            <div className="silk" style={{left:'50%', animationDuration:'9s', animationDelay:'2.2s', height:'80%'}} />
+            <div className="silk" style={{left:'62%', animationDuration:'6.5s', animationDelay:'0.4s', height:'65%'}} />
+            <div className="silk" style={{left:'75%', animationDuration:'8.5s', animationDelay:'1.1s', height:'55%'}} />
+            <div className="silk" style={{left:'85%', animationDuration:'7.5s', animationDelay:'3s', height:'70%'}} />
+            <div className="silk-wide" style={{left:'30%', animationDuration:'11s', animationDelay:'0s'}} />
+            <div className="silk-wide" style={{left:'55%', animationDuration:'13s', animationDelay:'2s'}} />
+            <div className="silk-wide" style={{left:'72%', animationDuration:'10s', animationDelay:'1s'}} />
+          </div>
+
+          {/* Robot */}
+          <div className="eve-pulse relative z-10">
             <Image src="/logo-icon.png" alt="E.V.E." width={440} height={440} priority />
           </div>
         </div>
-        <style>{`
-          @keyframes eve-pulse {
-            0%, 100% { filter: drop-shadow(0 0 18px rgba(124,58,237,0.35)) drop-shadow(0 0 40px rgba(124,58,237,0.15)); }
-            50%       { filter: drop-shadow(0 0 40px rgba(139,92,246,0.75)) drop-shadow(0 0 80px rgba(124,58,237,0.4)); }
-          }
-        `}</style>
 
-        <p className="text-zinc-400 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p className="text-zinc-400 text-xl max-w-2xl mx-auto mb-8 leading-relaxed relative z-10">
           VIBE writes your scripts. E.V.E. powers your edit inside Premiere Pro.<br />
           You focus on what only you can do — being behind the lens.
         </p>
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 relative z-10">
           <button
             onClick={() => router.push('/auth/signup')}
-            className="bg-violet-600 hover:bg-violet-500 transition text-white font-bold px-8 py-4 rounded-xl text-lg"
+            className="cta-primary text-white font-bold px-10 py-5 rounded-2xl text-xl"
           >
-            Start for free
+            Start for free — no card needed
           </button>
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-zinc-400 hover:text-white transition text-sm py-2"
+            className="text-zinc-500 hover:text-white transition text-sm py-2"
           >
             See how it works ↓
           </button>
         </div>
-        <p className="text-zinc-600 text-xs mt-4">No credit card required · 3 free VIBE tokens on signup</p>
+        <p className="text-zinc-600 text-xs mt-4 relative z-10">3 free VIBE tokens on signup · cancel anytime</p>
       </section>
 
-      {/* Dashboard preview */}
-      <section className="max-w-5xl mx-auto px-6 mb-24">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-zinc-800 rounded-xl p-5 text-left">
-              <p className="text-zinc-500 text-xs mb-1">VIBE Tokens</p>
-              <p className="text-3xl font-bold text-violet-400">7</p>
-            </div>
-            <div className="bg-zinc-800 rounded-xl p-5 text-left">
-              <p className="text-zinc-500 text-xs mb-1">Scripts generated</p>
-              <p className="text-3xl font-bold">24</p>
-            </div>
-            <div className="bg-zinc-800 rounded-xl p-5 text-left">
-              <p className="text-zinc-500 text-xs mb-1">Client themes</p>
-              <p className="text-3xl font-bold">6</p>
-            </div>
-          </div>
-          <div className="bg-violet-600/20 border border-violet-700 rounded-xl p-5 text-left">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-violet-400 font-semibold uppercase tracking-widest">Generated script — Hook</p>
-              <span className="text-xs bg-violet-900 text-violet-300 px-2 py-0.5 rounded-full">9/10 virality</span>
-            </div>
-            <p className="text-white font-medium text-lg">"Nobody tells you this about selling your home in a buyer's market."</p>
-            <p className="text-zinc-500 text-xs mt-2">Hook type: Curiosity gap · Est. duration: 45s</p>
-          </div>
-        </div>
+      {/* Animated Dashboard */}
+      <section className="max-w-3xl mx-auto px-6 mb-24">
+        <p className="text-center text-zinc-600 text-xs uppercase tracking-widest font-semibold mb-5">Watch VIBE work in real time</p>
+        <AnimatedDashboard />
       </section>
 
       {/* Features */}
@@ -122,7 +189,21 @@ export default function LandingPage() {
           <FeatureCard icon="✏️" title="Edit & Restore" description="Edit any generated script directly in the platform. Changed your mind? Restore the original with one click — no lost work." />
           <FeatureCard icon="🎬" title="Premiere Pro Plugin" description="E.V.E. lives inside Adobe Premiere Pro. Access your scripts, client notes, and files without ever leaving your timeline." />
           <FeatureCard icon="📁" title="Client Management" description="Every client's brand, scripts, and notes — organized in one place. Built for editors juggling multiple accounts at once." />
-          <FeatureCard icon="📈" title="Built for scale" description="One editor. Ten clients. Scripts in seconds. Your output goes up, your turnaround gets faster, your clients stay happy." />
+          <FeatureCard icon="🔗" title="Share with clients" description="Export any script as a PDF or share a clean link your client can open in their browser — no login, no hassle, just the script." />
+        </div>
+
+        {/* Share callout */}
+        <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-2xl px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <p className="font-bold text-lg mb-1">Share scripts with your clients — instantly.</p>
+            <p className="text-zinc-500 text-sm">One click. A clean link they can open anywhere. No login required.</p>
+          </div>
+          <button
+            onClick={() => router.push('/auth/signup')}
+            className="shrink-0 border border-violet-600 hover:bg-violet-600 transition text-violet-300 hover:text-white font-semibold px-5 py-2.5 rounded-xl text-sm"
+          >
+            Try it free →
+          </button>
         </div>
       </section>
 
@@ -130,7 +211,8 @@ export default function LandingPage() {
       <section className="bg-zinc-950 border-t border-b border-zinc-900 py-20 mb-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold mb-3">Meet VIBE</h2>
+            <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">The script engine</p>
+            <h2 className="text-3xl font-bold mb-3">This is how E.V.E. VIBEs.</h2>
             <p className="text-zinc-400 max-w-lg mx-auto">Video Idea Batch Engine — the AI script writer built into your workflow. Give it a client, tell it what you need, and it delivers production-ready scripts in seconds.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -138,7 +220,7 @@ export default function LandingPage() {
               <Step number="1" title="Pick a client theme" description="Select the brand profile you've built — their audience, platforms, voice, and goals." />
               <Step number="2" title="Customize (optional)" description="Specify a topic, hook style, tone, or CTA override. Or leave it blank — VIBE knows what to do." />
               <Step number="3" title="Generate" description="Scripts come back in seconds with hooks, body lines, CTA, b-roll notes, and a virality score." />
-              <Step number="4" title="Edit and use" description="Refine any script in the platform. Restore the original anytime with one click." />
+              <Step number="4" title="Edit, share, or use" description="Refine in the platform, share a link with your client, or export as PDF. One click either way." />
             </div>
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between mb-2">

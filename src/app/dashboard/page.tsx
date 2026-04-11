@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import type { Profile, TokenBalance } from '@/lib/types'
+import FeedbackPopup from '@/components/FeedbackPopup'
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -131,6 +132,7 @@ export default function DashboardPage() {
           </button>
         </div>
       </main>
+      <FeedbackPopup />
     </div>
   )
 }
