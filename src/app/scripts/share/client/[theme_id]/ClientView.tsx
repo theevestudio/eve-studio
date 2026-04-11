@@ -98,7 +98,7 @@ export default function ClientView({ scripts, themeId }: { scripts: any[], theme
                   className="transition-all duration-150 hover:scale-110 shrink-0"
                   title={isHearted ? 'Remove from picks' : 'Add to picks'}
                 >
-                  <svg width="48" height="40" viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="32" height="28" viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.8,17.5,16,21.2c6.2-3.7,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"
                       fill={isHearted ? '#8b5cf6' : 'none'}
