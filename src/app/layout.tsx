@@ -16,7 +16,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "The E.V.E. Studio",
   description: "VIBE writes your scripts. E.V.E. powers your edit. All you need to do is film.",
-  icons: { icon: "/logo-icon.png" },
 };
 
 export default function RootLayout({
