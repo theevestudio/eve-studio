@@ -98,6 +98,38 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* E.V.E. Plugin banner — subscribers only */}
+        {profile?.eve_subscription_active ? (
+          <div className="bg-zinc-900 border border-violet-800/50 rounded-xl p-6 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-xs text-violet-400 font-semibold uppercase tracking-widest mb-1">Premiere Pro Plugin</p>
+              <p className="text-lg font-bold">E.V.E. Plugin — v1.0</p>
+              <p className="text-zinc-400 text-sm mt-0.5">Access your scripts and client notes directly inside Adobe Premiere Pro.</p>
+            </div>
+            <a
+              href="/plugin/eve-studio-plugin.zxp"
+              download
+              className="shrink-0 bg-violet-600 hover:bg-violet-500 transition text-white font-bold px-5 py-3 rounded-xl text-sm whitespace-nowrap"
+            >
+              ↓ Download Plugin
+            </a>
+          </div>
+        ) : (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-xs text-zinc-500 font-semibold uppercase tracking-widest mb-1">Premiere Pro Plugin</p>
+              <p className="text-lg font-bold text-zinc-400">E.V.E. Plugin</p>
+              <p className="text-zinc-600 text-sm mt-0.5">Upgrade to an E.V.E. subscription to unlock the Premiere Pro plugin.</p>
+            </div>
+            <button
+              onClick={() => router.push('/dashboard/account')}
+              className="shrink-0 border border-violet-700 hover:border-violet-500 text-violet-400 hover:text-violet-300 transition font-bold px-5 py-3 rounded-xl text-sm whitespace-nowrap"
+            >
+              Upgrade to unlock
+            </button>
+          </div>
+        )}
+
         {/* Quick actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
