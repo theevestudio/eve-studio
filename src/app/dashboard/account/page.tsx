@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Profile, TokenBalance } from '@/lib/types'
@@ -12,6 +12,14 @@ const TOKEN_PACKS = [
 ]
 
 export default function AccountPage() {
+  return (
+    <Suspense fallback={<Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>}>
+      <AccountContent />
+    </Suspense>
+  )
+}
+
+function AccountContent() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [tokens, setTokens] = useState<TokenBalance | null>(null)
   const [loading, setLoading] = useState(true)

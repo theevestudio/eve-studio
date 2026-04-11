@@ -1,12 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import type { Theme, Script, TokenBalance } from '@/lib/types'
 
 export default function VibePage() {
+  return (
+    <Suspense fallback={<Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>}>
+      <VibeContent />
+    </Suspense>
+  )
+}
+
+function VibeContent() {
   const searchParams = useSearchParams()
   const [themes, setThemes] = useState<Theme[]>([])
   const [tokens, setTokens] = useState<TokenBalance | null>(null)
