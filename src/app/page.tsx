@@ -91,9 +91,13 @@ export default function LandingPage() {
       `}</style>
 
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 border-b border-zinc-900" style={{height: 100}}>
-        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={325} height={53} priority />
-        <div className="flex items-center gap-6">
+      <nav className="flex items-center justify-between px-4 md:px-6 border-b border-zinc-900" style={{height: 100}}>
+        {/* Desktop logo */}
+        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={325} height={53} priority className="hidden md:block" />
+        {/* Mobile logo */}
+        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={180} height={30} priority className="block md:hidden" />
+
+        <div className="flex items-center gap-3 md:gap-6">
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
             className="text-zinc-300 hover:text-white transition text-xl hidden md:block"
@@ -106,17 +110,25 @@ export default function LandingPage() {
           >
             Pricing
           </button>
+          {/* Sign in — purple on mobile, text on desktop */}
           <button
             onClick={() => router.push('/auth/login')}
-            className="text-zinc-300 hover:text-white transition text-xl"
+            className="hidden md:block text-zinc-300 hover:text-white transition text-xl"
+          >
+            Sign in
+          </button>
+          <button
+            onClick={() => router.push('/auth/login')}
+            className="block md:hidden bg-zinc-800 hover:bg-zinc-700 transition text-white font-semibold px-4 py-2.5 rounded-lg text-sm"
           >
             Sign in
           </button>
           <button
             onClick={() => router.push('/auth/signup')}
-            className="cta-primary text-white text-lg font-bold px-6 py-3 rounded-lg"
+            className="cta-primary text-white font-bold px-4 py-2.5 md:px-6 md:py-3 rounded-lg text-sm md:text-lg"
           >
-            Get started free
+            <span className="hidden md:inline">Get started free</span>
+            <span className="inline md:hidden">Start free</span>
           </button>
         </div>
       </nav>
@@ -170,6 +182,7 @@ export default function LandingPage() {
           </button>
         </div>
         <p className="text-zinc-600 text-xs mt-4 relative z-10">3 free VIBE tokens on signup · cancel anytime</p>
+        <p className="text-zinc-700 text-xs mt-2 relative z-10">Built by a video editor, for video editors.</p>
       </section>
 
       {/* Animated Dashboard */}
@@ -333,8 +346,11 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-900 px-8 py-8 flex items-center justify-between text-zinc-600 text-sm">
-        <span>© 2026 The E.V.E. Studio. All rights reserved.</span>
+      <footer className="border-t border-zinc-900 px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-600 text-sm">
+        <div className="flex flex-col items-center sm:items-start gap-1">
+          <span className="text-zinc-500">© 2026 The E.V.E. Studio. All rights reserved.</span>
+          <span className="text-zinc-700 text-xs">Built by a video editor, for video editors.</span>
+        </div>
         <div className="flex gap-6">
           <button className="hover:text-white transition">Privacy</button>
           <button className="hover:text-white transition">Terms</button>

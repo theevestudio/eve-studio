@@ -41,7 +41,18 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <Image src="/logo-stacked.png" alt="The E.V.E. Studio" width={240} height={240} priority />
+          <div style={{
+            animation: 'eve-auth-pulse 2.5s ease-in-out infinite',
+            borderRadius: '50%',
+          }}>
+            <Image src="/logo-stacked.png" alt="The E.V.E. Studio" width={240} height={240} priority />
+          </div>
+          <style>{`
+            @keyframes eve-auth-pulse {
+              0%, 100% { filter: drop-shadow(0 0 20px rgba(139,92,246,0.5)) drop-shadow(0 0 50px rgba(124,58,237,0.25)); }
+              50%       { filter: drop-shadow(0 0 45px rgba(167,139,250,0.9)) drop-shadow(0 0 90px rgba(139,92,246,0.5)); }
+            }
+          `}</style>
         </div>
         <p className="text-center text-zinc-500 text-sm mb-6">Start for free. No credit card required.</p>
 
