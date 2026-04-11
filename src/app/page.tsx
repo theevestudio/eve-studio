@@ -124,7 +124,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative max-w-4xl mx-auto px-6 pt-24 pb-20 text-center overflow-visible">
+      <section className="relative max-w-4xl mx-auto px-6 pt-8 pb-20 text-center overflow-visible">
 
         <h1 className="text-6xl font-bold leading-tight tracking-tight mb-2 relative z-10">
           Introducing E.V.E.
@@ -132,7 +132,7 @@ export default function LandingPage() {
         <p className="text-zinc-500 text-xl font-medium mb-1 tracking-wide relative z-10">(Script. Film. Edit. Repeat.)</p>
 
         {/* Robot + silky background */}
-        <div className="relative flex justify-center" style={{marginTop: '-80px', marginBottom: '-80px'}}>
+        <div className="relative flex justify-center" style={{marginTop: '8px', marginBottom: '-80px'}}>
           {/* Silk background */}
           <div className="silk-wrap" style={{width: 440, height: 440, left: '50%', transform: 'translateX(-50%)', borderRadius: '50%'}}>
             <div className="silk" style={{left:'15%', animationDuration:'6s', animationDelay:'0s', height:'55%'}} />
