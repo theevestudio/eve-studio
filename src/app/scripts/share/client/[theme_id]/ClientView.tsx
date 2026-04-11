@@ -16,7 +16,7 @@ function getOrCreateSession(): string {
 
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
-    <svg width="28" height="24" viewBox="-2 -2 36 34" xmlns="http://www.w3.org/2000/svg">
+    <svg width="24" height="20" viewBox="-2 -2 36 34" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.8,17.5,16,21.2c6.2-3.7,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"
         fill={filled ? '#8b5cf6' : 'none'}
@@ -87,7 +87,7 @@ export default function ClientView({ scripts, themeId }: { scripts: any[], theme
           return (
             <div
               key={script.id}
-              className={`border rounded-2xl overflow-hidden transition-all duration-200 ${
+              className={`border rounded-2xl transition-all duration-200 ${
                 isHearted ? 'border-violet-600 bg-violet-950/20' : 'border-zinc-800 bg-zinc-900'
               }`}
             >
