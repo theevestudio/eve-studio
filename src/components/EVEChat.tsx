@@ -12,6 +12,7 @@ export default function EVEChat() {
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [retryPayload, setRetryPayload] = useState<Message[] | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -30,6 +31,7 @@ export default function EVEChat() {
     setMessages(newMessages)
     setInput('')
     setLoading(true)
+    setRetryPayload(null)
 
     try {
       const res = await fetch('/api/chat', {
@@ -41,6 +43,29 @@ export default function EVEChat() {
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply || data.error || 'Something went wrong.' }])
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error — please try again.' }])
+      setRetryPayload(newMessages)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function retry() {
+    if (!retryPayload) return
+    const payload = retryPayload
+    setRetryPayload(null)
+    setMessages(prev => prev.slice(0, -1))
+    setLoading(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: payload }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || data.error || 'Something went wrong.' }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error — please try again.' }])
+      setRetryPayload(payload)
     } finally {
       setLoading(false)
     }
@@ -94,6 +119,16 @@ export default function EVEChat() {
                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
+              </div>
+            )}
+            {retryPayload && !loading && (
+              <div className="flex justify-start">
+                <button
+                  onClick={retry}
+                  className="text-xs text-violet-400 hover:text-violet-300 transition border border-violet-800 hover:border-violet-600 px-3 py-1.5 rounded-xl"
+                >
+                  ↺ Retry
+                </button>
               </div>
             )}
             <div ref={bottomRef} />

@@ -27,7 +27,7 @@ export default async function ClientSharePage({ params }: { params: Promise<{ th
           )}
           <h1 className="text-3xl font-bold mb-2">{theme.client_name}</h1>
           <p className="text-zinc-500 text-sm">
-            Here are your scripts — heart the ones you love so your editor knows which to film first.
+            {scripts.length} script{scripts.length !== 1 ? 's' : ''} — heart the ones you love so your editor knows which to film first.
           </p>
         </div>
 

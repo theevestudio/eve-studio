@@ -107,6 +107,14 @@ export default async function ScriptPrintPage({ params }: { params: Promise<{ id
             font-weight: 600;
             cursor: pointer;
           }
+          @media (max-width: 600px) {
+            body { padding: 24px 16px; }
+            .header { flex-direction: column; gap: 12px; }
+            .meta { text-align: left; }
+            .title { font-size: 18px; }
+            .hook { font-size: 16px; }
+            .print-btn { top: 12px; right: 12px; padding: 8px 14px; font-size: 12px; }
+          }
           @media print {
             .print-btn { display: none; }
             body { padding: 32px; }

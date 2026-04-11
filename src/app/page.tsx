@@ -171,13 +171,13 @@ export default function LandingPage() {
             See how it works ↓
           </button>
         </div>
-        <p className="text-zinc-600 text-xs mt-4 relative z-10">3 free VIBE tokens on signup · cancel anytime</p>
-        <p className="text-zinc-700 text-xs mt-2 relative z-10">Built by a video editor, for video editors.</p>
+        <p className="text-zinc-500 text-sm mt-4 relative z-10">3 free VIBE tokens on signup · cancel anytime</p>
+        <p className="text-zinc-600 text-sm mt-1 relative z-10">Built by a video editor, for video editors.</p>
       </section>
 
       {/* Animated Dashboard */}
       <section className="max-w-3xl mx-auto px-6 mb-24">
-        <p className="text-center text-zinc-600 text-xs uppercase tracking-widest font-semibold mb-5">Watch VIBE work in real time</p>
+        <p className="text-center text-zinc-400 text-sm uppercase tracking-widest font-semibold mb-5">Watch VIBE work in real time</p>
         <AnimatedDashboard />
       </section>
 
@@ -339,7 +339,7 @@ export default function LandingPage() {
       <footer className="border-t border-zinc-900 px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-600 text-sm">
         <div className="flex flex-col items-center sm:items-start gap-1">
           <span className="text-zinc-500">© 2026 The E.V.E. Studio. All rights reserved.</span>
-          <span className="text-zinc-700 text-xs">Built by a video editor, for video editors.</span>
+          <span className="text-zinc-600 text-xs">Built by a video editor, for video editors.</span>
         </div>
         <div className="flex gap-6">
           <button className="hover:text-white transition">Privacy</button>

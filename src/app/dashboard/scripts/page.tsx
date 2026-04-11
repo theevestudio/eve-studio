@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Script, Theme } from '@/lib/types'
+import { useToast, Toast } from '@/components/Toast'
+import LoadingEVE from '@/components/LoadingEVE'
 
 export default function ScriptsPage() {
   const [scripts, setScripts] = useState<Script[]>([])
@@ -15,6 +17,8 @@ export default function ScriptsPage() {
   const [editDraft, setEditDraft] = useState<any>(null)
   const [saving, setSaving] = useState(false)
   const [enhancing, setEnhancing] = useState<string | null>(null)
+  const [confirmRestoreId, setConfirmRestoreId] = useState<string | null>(null)
+  const { toast, show: showToast } = useToast()
   const router = useRouter()
   const supabase = createClient()
 
@@ -80,13 +84,13 @@ export default function ScriptsPage() {
       c.duration_estimate ? `\nEst. duration: ${c.duration_estimate}` : '',
     ].filter(Boolean).join('\n')
     navigator.clipboard.writeText(text)
-    alert('Script copied to clipboard')
+    showToast('Script copied to clipboard')
   }
 
   function handleShare(script: Script) {
     const url = `${window.location.origin}/scripts/share/${script.id}`
     navigator.clipboard.writeText(url)
-    alert('Share link copied to clipboard')
+    showToast('Share link copied to clipboard')
   }
 
   async function handleEnhance(script: Script) {
@@ -99,16 +103,18 @@ export default function ScriptsPage() {
     const data = await res.json()
     if (res.ok && data.script) {
       setScripts(prev => prev.map(s => s.id === script.id ? data.script : s))
+      showToast('Script enhanced')
     } else {
-      alert(data.error || 'Enhancement failed')
+      showToast(data.error || 'Enhancement failed', 'error')
     }
     setEnhancing(null)
   }
 
-  if (loading) return <Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>
+  if (loading) return <Shell><LoadingEVE /></Shell>
 
   return (
     <Shell>
+      <Toast toast={toast} />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold">Scripts</h1>
@@ -295,14 +301,30 @@ export default function ScriptsPage() {
                             >
                               Edit
                             </button>
-                            {script.is_edited && (
+                            {script.is_edited && confirmRestoreId === script.id ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-zinc-400">This will overwrite your edits.</span>
+                                <button
+                                  onClick={() => { handleRestore(script); setConfirmRestoreId(null) }}
+                                  className="text-xs text-red-400 hover:text-red-300 transition border border-red-800 hover:border-red-600 px-2.5 py-1 rounded-lg"
+                                >
+                                  Yes, restore
+                                </button>
+                                <button
+                                  onClick={() => setConfirmRestoreId(null)}
+                                  className="text-xs text-zinc-500 hover:text-white transition px-2"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : script.is_edited ? (
                               <button
-                                onClick={() => handleRestore(script)}
+                                onClick={() => setConfirmRestoreId(script.id)}
                                 className="text-sm text-violet-400 hover:text-violet-300 transition border border-violet-800 hover:border-violet-600 px-3 py-1.5 rounded-lg"
                               >
                                 Restore original
                               </button>
-                            )}
+                            ) : null}
                             {isImported && (
                               <button
                                 onClick={() => handleEnhance(script)}
@@ -336,7 +358,7 @@ export default function ScriptsPage() {
                                 onClick={() => {
                                   const url = `${window.location.origin}/scripts/share/client/${script.theme_id}`
                                   navigator.clipboard.writeText(url)
-                                  alert('Client page link copied!')
+                                  showToast('Client page link copied!')
                                 }}
                                 className="text-sm text-violet-400 hover:text-violet-300 transition border border-violet-800 hover:border-violet-600 px-3 py-1.5 rounded-lg"
                               >

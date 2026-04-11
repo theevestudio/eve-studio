@@ -94,20 +94,7 @@ Rules:
     return NextResponse.json({ error: 'Script generation failed. Please try again.' }, { status: 500 })
   }
 
-  // Deduct tokens
-  await admin
-    .from('token_balances')
-    .update({ balance: balance.balance - count, updated_at: new Date().toISOString() })
-    .eq('user_id', user.id)
-
-  await admin.from('token_transactions').insert({
-    user_id: user.id,
-    amount: -count,
-    type: 'spend',
-    description: `Generated ${count} script(s) for ${theme.client_name}`,
-  })
-
-  // Save scripts
+  // Save scripts first — deduct tokens only if save succeeds
   const batch_id = crypto.randomUUID()
   const scriptRows = parsed.map(s => ({
     user_id: user.id,
@@ -135,9 +122,26 @@ Rules:
     is_edited: false,
   }))
 
-  const { data: savedScripts } = await admin.from('scripts').insert(scriptRows).select()
+  const { data: savedScripts, error: saveError } = await admin.from('scripts').insert(scriptRows).select()
 
-  return NextResponse.json({ scripts: savedScripts, batch_id, new_balance: balance.balance - count })
+  if (saveError || !savedScripts) {
+    return NextResponse.json({ error: 'Failed to save scripts. Your tokens were not deducted.' }, { status: 500 })
+  }
+
+  // Deduct tokens after successful save
+  await admin
+    .from('token_balances')
+    .update({ balance: balance.balance - count, updated_at: new Date().toISOString() })
+    .eq('user_id', user.id)
+
+  await admin.from('token_transactions').insert({
+    user_id: user.id,
+    amount: -count,
+    type: 'spend',
+    description: `Generated ${count} script(s) for ${theme.client_name}`,
+  })
+
+  return NextResponse.json({ scripts: savedScripts!, batch_id, new_balance: balance.balance - count })
 }
 
 function buildThemeContext(theme: any): string {

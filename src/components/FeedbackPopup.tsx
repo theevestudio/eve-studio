@@ -91,7 +91,7 @@ export default function FeedbackPopup() {
                   onMouseLeave={() => setHovered(0)}
                   onClick={() => setStars(s)}
                   className="text-3xl transition-all duration-150"
-                  style={{ opacity: s <= (hovered || stars) ? 1 : 0.25, transform: s <= (hovered || stars) ? 'scale(1.15)' : 'scale(1)' }}
+                  style={{ opacity: s <= (hovered || stars) ? 1 : 0.25 }}
                 >
                   ★
                 </button>

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import type { Theme, Script, TokenBalance } from '@/lib/types'
+import LoadingEVE from '@/components/LoadingEVE'
 
 export default function VibePage() {
   return (
@@ -29,6 +30,7 @@ function VibeContent() {
   const [scripts, setScripts] = useState<Script[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const [confirmGenerate, setConfirmGenerate] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -68,12 +70,12 @@ function VibeContent() {
       return
     }
 
-    setScripts(data.scripts)
+    setScripts(data.scripts || [])
     setTokens(prev => prev ? { ...prev, balance: data.new_balance } : prev)
     setGenerating(false)
   }
 
-  if (loading) return <Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>
+  if (loading) return <Shell><LoadingEVE /></Shell>
 
   return (
     <Shell>
@@ -222,13 +224,36 @@ function VibeContent() {
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
-          <button
-            onClick={handleGenerate}
-            disabled={generating || !selectedTheme || (tokens?.balance ?? 0) < count}
-            className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 transition text-white font-bold py-4 rounded-xl text-lg"
-          >
-            {generating ? 'Generating scripts...' : `Generate ${count} Script${count !== 1 ? 's' : ''}`}
-          </button>
+          {confirmGenerate ? (
+            <div className="border border-violet-700 bg-violet-950/30 rounded-xl px-5 py-4 space-y-3">
+              <p className="text-white font-semibold text-sm">
+                Generate {count} script{count !== 1 ? 's' : ''} for <span className="text-violet-400">{count} token{count !== 1 ? 's' : ''}</span>?
+              </p>
+              <p className="text-zinc-500 text-xs">Your balance will go from {tokens?.balance ?? 0} → {(tokens?.balance ?? 0) - count} tokens.</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setConfirmGenerate(false); handleGenerate() }}
+                  className="flex-1 bg-violet-600 hover:bg-violet-500 transition text-white font-bold py-3 rounded-xl text-sm"
+                >
+                  Confirm — Generate
+                </button>
+                <button
+                  onClick={() => setConfirmGenerate(false)}
+                  className="px-4 py-3 text-zinc-400 hover:text-white transition text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmGenerate(true)}
+              disabled={generating || !selectedTheme || (tokens?.balance ?? 0) < count}
+              className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 transition text-white font-bold py-4 rounded-xl text-lg"
+            >
+              {generating ? 'Generating scripts...' : `Generate ${count} Script${count !== 1 ? 's' : ''}`}
+            </button>
+          )}
 
           {generating && (
             <div className="text-center text-zinc-500 text-sm animate-pulse">
