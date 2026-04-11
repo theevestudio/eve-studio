@@ -55,8 +55,11 @@ export default function ClientView({ scripts, themeId }: { scripts: any[], theme
   return (
     <div>
       {heartedCount > 0 && (
-        <p className="text-violet-400 text-sm mb-6">
-          ♥ {heartedCount} script{heartedCount !== 1 ? 's' : ''} picked
+        <p className="text-violet-400 text-sm mb-6 flex items-center gap-1.5">
+          <svg width="16" height="16" viewBox="0 0 36 36" fill="#8b5cf6" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 30s-13-8.5-13-17a8 8 0 0 1 13-6.2A8 8 0 0 1 31 13c0 8.5-13 17-13 17z" strokeLinejoin="round"/>
+          </svg>
+          {heartedCount} script{heartedCount !== 1 ? 's' : ''} picked
         </p>
       )}
 
@@ -92,11 +95,18 @@ export default function ClientView({ scripts, themeId }: { scripts: any[], theme
 
                 <button
                   onClick={() => toggleHeart(script.id)}
-                  className="text-3xl transition-all duration-150 hover:scale-110 shrink-0"
-                  style={{ color: isHearted ? '#8b5cf6' : '#3f3f46' }}
+                  className="transition-all duration-150 hover:scale-110 shrink-0"
                   title={isHearted ? 'Remove from picks' : 'Add to picks'}
                 >
-                  {isHearted ? '♥' : '♡'}
+                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M18 30s-13-8.5-13-17a8 8 0 0 1 13-6.2A8 8 0 0 1 31 13c0 8.5-13 17-13 17z"
+                      fill={isHearted ? '#8b5cf6' : 'none'}
+                      stroke={isHearted ? '#8b5cf6' : '#71717a'}
+                      strokeWidth="2.5"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </button>
               </div>
 
