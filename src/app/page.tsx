@@ -192,14 +192,14 @@ export default function LandingPage() {
           <FeatureCard icon="✏️" title="Edit & Restore" description="Edit any generated script directly in the platform. Changed your mind? Restore the original with one click — no lost work." />
           <FeatureCard icon="🎬" title="Premiere Pro Plugin" description="E.V.E. lives inside Adobe Premiere Pro. Access your scripts, client notes, and files without ever leaving your timeline." />
           <FeatureCard icon="📁" title="Client Management" description="Every client's brand, scripts, and notes — organized in one place. Built for editors juggling multiple accounts at once." />
-          <FeatureCard icon="🔗" title="Share with clients" description="Export any script as a PDF or share a clean link your client can open in their browser — no login, no hassle, just the script." />
+          <FeatureCard icon="🔗" title="Share with clients" description="Send one link — your client sees every script you made for them, hearts the ones they love, and you know exactly which to film first." />
         </div>
 
         {/* Share callout */}
         <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-2xl px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
-            <p className="font-bold text-lg mb-1">Share scripts with your clients — instantly.</p>
-            <p className="text-zinc-500 text-sm">One click. A clean link they can open anywhere. No login required.</p>
+            <p className="font-bold text-lg mb-1">Share all your client&apos;s scripts with one link.</p>
+            <p className="text-zinc-500 text-sm">They open it, read through, and heart the ones they love. You see the picks instantly — no back-and-forth, no confusion.</p>
           </div>
           <button
             onClick={() => router.push('/auth/signup')}
