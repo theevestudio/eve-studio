@@ -48,8 +48,19 @@ export default function LandingPage() {
         <p className="text-zinc-500 text-xl font-medium mb-1 tracking-wide">(Script. Film. Edit. Repeat.)</p>
 
         <div className="flex justify-center" style={{marginTop: '-80px', marginBottom: '-80px'}}>
-          <Image src="/logo-icon.png" alt="E.V.E." width={440} height={440} priority />
+          <div style={{
+            animation: 'eve-pulse 3s ease-in-out infinite',
+            borderRadius: '50%',
+          }}>
+            <Image src="/logo-icon.png" alt="E.V.E." width={440} height={440} priority />
+          </div>
         </div>
+        <style>{`
+          @keyframes eve-pulse {
+            0%, 100% { filter: drop-shadow(0 0 18px rgba(124,58,237,0.35)) drop-shadow(0 0 40px rgba(124,58,237,0.15)); }
+            50%       { filter: drop-shadow(0 0 40px rgba(139,92,246,0.75)) drop-shadow(0 0 80px rgba(124,58,237,0.4)); }
+          }
+        `}</style>
 
         <p className="text-zinc-400 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
           VIBE writes your scripts. E.V.E. powers your edit inside Premiere Pro.<br />

@@ -63,6 +63,27 @@ export default function ScriptsPage() {
     }
   }
 
+  function handleCopy(script: Script) {
+    const c = script.script_content
+    if (!c) return
+    const text = [
+      script.title ? `${script.title}\n` : '',
+      `HOOK\n${c.hook}`,
+      `\nBODY\n${c.body?.join('\n')}`,
+      `\nCTA\n${c.cta}`,
+      c.b_roll_notes?.length ? `\nB-ROLL NOTES\n${c.b_roll_notes.map(n => `· ${n}`).join('\n')}` : '',
+      c.duration_estimate ? `\nEst. duration: ${c.duration_estimate}` : '',
+    ].filter(Boolean).join('\n')
+    navigator.clipboard.writeText(text)
+    alert('Script copied to clipboard')
+  }
+
+  function handleShare(script: Script) {
+    const url = `${window.location.origin}/scripts/share/${script.id}`
+    navigator.clipboard.writeText(url)
+    alert('Share link copied to clipboard')
+  }
+
   async function handleEnhance(script: Script) {
     setEnhancing(script.id)
     const res = await fetch('/api/scripts/enhance', {
@@ -283,6 +304,25 @@ export default function ScriptsPage() {
                                 {enhancing === script.id ? 'Enhancing...' : '✦ Enhance with VIBE — 1 token'}
                               </button>
                             )}
+                            <button
+                              onClick={() => handleCopy(script)}
+                              className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
+                            >
+                              Copy
+                            </button>
+                            <a
+                              href={`/dashboard/scripts/${script.id}/print`}
+                              target="_blank"
+                              className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
+                            >
+                              Export PDF
+                            </a>
+                            <button
+                              onClick={() => handleShare(script)}
+                              className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
+                            >
+                              Share link
+                            </button>
                           </div>
                         </>
                       )
