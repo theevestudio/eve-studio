@@ -16,7 +16,7 @@ function getOrCreateSession(): string {
 
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
-    <svg width="28" height="24" viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+    <svg width="28" height="24" viewBox="-2 -2 36 34" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.8,17.5,16,21.2c6.2-3.7,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"
         fill={filled ? '#8b5cf6' : 'none'}
@@ -71,7 +71,7 @@ export default function ClientView({ scripts, themeId }: { scripts: any[], theme
     <div>
       {heartedCount > 0 && (
         <p className="text-violet-400 text-sm mb-6 flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 32 29.6" fill="#8b5cf6" xmlns="http://www.w3.org/2000/svg">
+          <svg width="14" height="14" viewBox="-2 -2 36 34" fill="#8b5cf6" xmlns="http://www.w3.org/2000/svg">
             <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.8,17.5,16,21.2c6.2-3.7,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
           </svg>
           {heartedCount} script{heartedCount !== 1 ? 's' : ''} picked
