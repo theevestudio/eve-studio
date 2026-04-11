@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 const SCENARIOS = [
   {
-    client: 'Coastal Key Realty',
+    client: 'Pinnacle Property Group',
     industry: 'Real Estate',
     customPrompt: null,
     script: {
