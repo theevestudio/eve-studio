@@ -90,46 +90,36 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-4 md:px-6 border-b border-zinc-900" style={{height: 100}}>
-        {/* Desktop logo */}
-        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={325} height={53} priority className="hidden md:block" />
-        {/* Mobile logo */}
-        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={180} height={30} priority className="block md:hidden" />
+      {/* Nav — desktop: single row | mobile: logo top, buttons bottom */}
+      <nav className="border-b border-zinc-900">
+        {/* Desktop */}
+        <div className="hidden md:flex items-center justify-between px-6" style={{height: 100}}>
+          <Image src="/logo-full.png" alt="The E.V.E. Studio" width={325} height={53} priority />
+          <div className="flex items-center gap-6">
+            <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="text-zinc-300 hover:text-white transition text-xl">Features</button>
+            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-zinc-300 hover:text-white transition text-xl">Pricing</button>
+            <button onClick={() => router.push('/auth/login')} className="text-zinc-300 hover:text-white transition text-xl">Sign in</button>
+            <button onClick={() => router.push('/auth/signup')} className="cta-primary text-white font-bold px-6 py-3 rounded-lg text-lg">Get started free</button>
+          </div>
+        </div>
 
-        <div className="flex items-center gap-3 md:gap-6">
-          <button
-            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-zinc-300 hover:text-white transition text-xl hidden md:block"
-          >
-            Features
-          </button>
-          <button
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-zinc-300 hover:text-white transition text-xl hidden md:block"
-          >
-            Pricing
-          </button>
-          {/* Sign in — purple on mobile, text on desktop */}
-          <button
-            onClick={() => router.push('/auth/login')}
-            className="hidden md:block text-zinc-300 hover:text-white transition text-xl"
-          >
-            Sign in
-          </button>
-          <button
-            onClick={() => router.push('/auth/login')}
-            className="block md:hidden bg-zinc-800 hover:bg-zinc-700 transition text-white font-semibold px-4 py-2.5 rounded-lg text-sm"
-          >
-            Sign in
-          </button>
-          <button
-            onClick={() => router.push('/auth/signup')}
-            className="cta-primary text-white font-bold px-4 py-2.5 md:px-6 md:py-3 rounded-lg text-sm md:text-lg"
-          >
-            <span className="hidden md:inline">Get started free</span>
-            <span className="inline md:hidden">Start free</span>
-          </button>
+        {/* Mobile */}
+        <div className="flex md:hidden flex-col items-center py-4 gap-3 px-4">
+          <Image src="/logo-full.png" alt="The E.V.E. Studio" width={200} height={33} priority />
+          <div className="flex w-full gap-3">
+            <button
+              onClick={() => router.push('/auth/login')}
+              className="flex-1 bg-zinc-800 hover:bg-zinc-700 transition text-white font-semibold py-3 rounded-lg text-sm"
+            >
+              Sign in
+            </button>
+            <button
+              onClick={() => router.push('/auth/signup')}
+              className="flex-1 cta-primary text-white font-bold py-3 rounded-lg text-sm"
+            >
+              Start free
+            </button>
+          </div>
         </div>
       </nav>
 
