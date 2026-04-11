@@ -166,18 +166,18 @@ export default function LandingPage() {
           </button>
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-zinc-500 hover:text-white transition text-sm py-2"
+            className="text-zinc-500 hover:text-white transition text-base py-2"
           >
             See how it works ↓
           </button>
         </div>
-        <p className="text-zinc-500 text-sm mt-4 relative z-10">3 free VIBE tokens on signup · cancel anytime</p>
-        <p className="text-zinc-600 text-sm mt-1 relative z-10">Built by a video editor, for video editors.</p>
+        <p className="text-zinc-500 text-base mt-4 relative z-10">3 free VIBE tokens on signup · cancel anytime</p>
+        <p className="text-zinc-600 text-base mt-1 relative z-10">Built by a video editor, for video editors.</p>
       </section>
 
       {/* Animated Dashboard */}
       <section className="max-w-3xl mx-auto px-6 mb-24">
-        <p className="text-center text-zinc-400 text-sm uppercase tracking-widest font-semibold mb-5">Watch VIBE work in real time</p>
+        <p className="text-center text-zinc-400 text-base uppercase tracking-widest font-semibold mb-5">Watch VIBE work in real time</p>
         <AnimatedDashboard />
       </section>
 
