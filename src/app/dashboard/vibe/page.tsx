@@ -9,7 +9,7 @@ import LoadingEVE from '@/components/LoadingEVE'
 
 export default function VibePage() {
   return (
-    <Suspense fallback={<Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>}>
+    <Suspense fallback={<Shell><LoadingEVE /></Shell>}>
       <VibeContent />
     </Suspense>
   )

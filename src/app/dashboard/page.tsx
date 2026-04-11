@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import type { Profile, TokenBalance } from '@/lib/types'
 import FeedbackPopup from '@/components/FeedbackPopup'
+import LoadingEVE from '@/components/LoadingEVE'
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -42,7 +43,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-zinc-500 text-sm">Loading...</div>
+        <LoadingEVE />
       </div>
     )
   }

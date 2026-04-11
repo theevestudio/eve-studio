@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Profile, TokenBalance } from '@/lib/types'
+import LoadingEVE from '@/components/LoadingEVE'
 
 const TOKEN_PACKS = [
   { tokens: 5,  price: '$4',  label: '5 tokens',  priceKey: 'TOKENS_5',  best: false },
@@ -13,7 +14,7 @@ const TOKEN_PACKS = [
 
 export default function AccountPage() {
   return (
-    <Suspense fallback={<Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>}>
+    <Suspense fallback={<Shell><LoadingEVE /></Shell>}>
       <AccountContent />
     </Suspense>
   )
@@ -66,7 +67,7 @@ function AccountContent() {
     else setCheckingOut(null)
   }
 
-  if (loading) return <Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>
+  if (loading) return <Shell><LoadingEVE /></Shell>
 
   return (
     <Shell>

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Theme } from '@/lib/types'
+import LoadingEVE from '@/components/LoadingEVE'
 
 export default function ImportScriptPage() {
   const [themes, setThemes] = useState<Theme[]>([])
@@ -102,7 +103,7 @@ export default function ImportScriptPage() {
     setImporting(false)
   }
 
-  if (loading) return <Shell><div className="text-zinc-500 text-sm">Loading...</div></Shell>
+  if (loading) return <Shell><LoadingEVE /></Shell>
 
   if (success) {
     return (

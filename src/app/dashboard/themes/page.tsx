@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Theme } from '@/lib/types'
+import LoadingEVE from '@/components/LoadingEVE'
 
 export default function ThemesPage() {
   const [themes, setThemes] = useState<Theme[]>([])
@@ -23,7 +24,7 @@ export default function ThemesPage() {
     load()
   }, [])
 
-  if (loading) return <PageShell><div className="text-zinc-500 text-sm">Loading...</div></PageShell>
+  if (loading) return <PageShell><LoadingEVE /></PageShell>
 
   return (
     <PageShell>

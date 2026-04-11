@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
 import type { Theme } from '@/lib/types'
+import LoadingEVE from '@/components/LoadingEVE'
 
 export default function ThemeDetailPage() {
   const [theme, setTheme] = useState<Theme | null>(null)
@@ -24,7 +25,7 @@ export default function ThemeDetailPage() {
     load()
   }, [])
 
-  if (loading) return <Shell onBack={() => router.push('/dashboard/themes')} name=""><div className="text-zinc-500 text-sm">Loading...</div></Shell>
+  if (loading) return <Shell onBack={() => router.push('/dashboard/themes')} name=""><LoadingEVE /></Shell>
   if (!theme) return null
 
   return (
