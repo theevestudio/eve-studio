@@ -215,7 +215,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-14">
             <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">The script engine</p>
-            <h2 className="text-3xl font-bold mb-3">EVE Is a VIBE.</h2>
+            <h2 className="text-3xl font-bold mb-3">E.V.E. is a VIBE.</h2>
             <p className="text-zinc-400 max-w-lg mx-auto">Video Idea Batch Engine — the AI script writer built into your workflow. Give it a client, tell it what you need, and it delivers production-ready scripts in seconds.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">

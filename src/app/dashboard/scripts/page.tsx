@@ -8,6 +8,7 @@ import type { Script, Theme } from '@/lib/types'
 export default function ScriptsPage() {
   const [scripts, setScripts] = useState<Script[]>([])
   const [themes, setThemes] = useState<Record<string, Theme>>({})
+  const [heartCounts, setHeartCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -22,15 +23,19 @@ export default function ScriptsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
 
-      const [{ data: s }, { data: t }] = await Promise.all([
+      const [{ data: s }, { data: t }, { data: h }] = await Promise.all([
         supabase.from('scripts').select('*').order('created_at', { ascending: false }),
         supabase.from('themes').select('*'),
+        supabase.from('script_hearts').select('script_id'),
       ])
 
       setScripts(s || [])
       const themeMap: Record<string, Theme> = {}
       ;(t || []).forEach(th => { themeMap[th.id] = th })
       setThemes(themeMap)
+      const counts: Record<string, number> = {}
+      ;(h || []).forEach(r => { counts[r.script_id] = (counts[r.script_id] || 0) + 1 })
+      setHeartCounts(counts)
       setLoading(false)
     }
     load()
@@ -184,6 +189,9 @@ export default function ScriptsPage() {
                     {script.virality_score && (
                       <span className="text-xs bg-violet-900 text-violet-300 px-2 py-0.5 rounded-full">{script.virality_score}/10</span>
                     )}
+                    {heartCounts[script.id] > 0 && (
+                      <span className="text-xs text-violet-400 font-semibold">♥ {heartCounts[script.id]}</span>
+                    )}
                     <span className="text-zinc-600 text-sm">{isExpanded ? '▲' : '▼'}</span>
                   </div>
                 </div>
@@ -321,8 +329,20 @@ export default function ScriptsPage() {
                               onClick={() => handleShare(script)}
                               className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
                             >
-                              Share link
+                              Share script
                             </button>
+                            {script.theme_id && (
+                              <button
+                                onClick={() => {
+                                  const url = `${window.location.origin}/scripts/share/client/${script.theme_id}`
+                                  navigator.clipboard.writeText(url)
+                                  alert('Client page link copied!')
+                                }}
+                                className="text-sm text-violet-400 hover:text-violet-300 transition border border-violet-800 hover:border-violet-600 px-3 py-1.5 rounded-lg"
+                              >
+                                ♥ Share client page
+                              </button>
+                            )}
                           </div>
                         </>
                       )
