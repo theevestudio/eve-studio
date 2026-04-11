@@ -103,7 +103,7 @@ export default function ClientView({ scripts, themeId }: { scripts: any[], theme
                       d="M18 30s-13-8.5-13-17a8 8 0 0 1 13-6.2A8 8 0 0 1 31 13c0 8.5-13 17-13 17z"
                       fill={isHearted ? '#8b5cf6' : 'none'}
                       stroke={isHearted ? '#8b5cf6' : '#71717a'}
-                      strokeWidth="2.5"
+                      strokeWidth="4"
                       strokeLinejoin="round"
                     />
                   </svg>
