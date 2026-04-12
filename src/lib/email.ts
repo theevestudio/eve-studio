@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
 export async function sendNdaApprovalEmail({
   name,
@@ -9,11 +9,18 @@ export async function sendNdaApprovalEmail({
   email: string
   signingUrl: string
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const { error } = await resend.emails.send({
-    from: 'E.V.E. Studio <noreply@theevestudio.io>',
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  })
+
+  await transporter.sendMail({
+    from: `E.V.E. Studio <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: 'You\'re approved — sign your NDA to activate access',
+    subject: "You're approved — sign your NDA to activate access",
     html: `
 <!DOCTYPE html>
 <html>
@@ -23,14 +30,12 @@ export async function sendNdaApprovalEmail({
     <tr>
       <td align="center">
         <table width="560" cellpadding="0" cellspacing="0" style="background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;">
-          <!-- Header -->
           <tr>
             <td style="padding:36px 40px 24px;border-bottom:1px solid #1a1a1a;">
               <p style="margin:0;font-size:13px;font-weight:600;letter-spacing:0.15em;color:#888;text-transform:uppercase;">The E.V.E. Studio</p>
               <h1 style="margin:12px 0 0;font-size:26px;font-weight:600;color:#fff;line-height:1.3;">You're approved, ${name}.</h1>
             </td>
           </tr>
-          <!-- Body -->
           <tr>
             <td style="padding:32px 40px;">
               <p style="margin:0 0 20px;font-size:15px;color:#aaa;line-height:1.7;">
@@ -39,14 +44,13 @@ export async function sendNdaApprovalEmail({
               <p style="margin:0 0 32px;font-size:15px;color:#aaa;line-height:1.7;">
                 It takes about 60 seconds — just read, type your name, and confirm. Your access goes live the moment you sign.
               </p>
-              <!-- CTA Button -->
-              <a href="${signingUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:14px 28px;background:#fff;border-radius:8px;font-size:15px;font-weight:600;color:#000;text-decoration:none;letter-spacing:-0.01em;">
+              <a href="${signingUrl}" target="_blank" style="display:inline-block;padding:14px 28px;background:#fff;border-radius:8px;font-size:15px;font-weight:600;color:#000;text-decoration:none;">
                 Sign my NDA &rarr;
               </a>
-              <p style="margin:20px 0 0;font-size:13px;color:#555;line-height:1.6;">
-                If the button doesn't open, copy and paste this link into your browser:
+              <p style="margin:20px 0 4px;font-size:13px;color:#555;line-height:1.6;">
+                Or copy this link into your browser:
               </p>
-              <p style="margin:6px 0 0;font-size:13px;color:#888;line-height:1.6;word-break:break-all;">
+              <p style="margin:0;font-size:13px;color:#888;word-break:break-all;">
                 ${signingUrl}
               </p>
               <p style="margin:16px 0 0;font-size:13px;color:#555;line-height:1.6;">
@@ -54,7 +58,6 @@ export async function sendNdaApprovalEmail({
               </p>
             </td>
           </tr>
-          <!-- Footer -->
           <tr>
             <td style="padding:20px 40px 28px;border-top:1px solid #1a1a1a;">
               <p style="margin:0;font-size:12px;color:#444;">
@@ -70,6 +73,4 @@ export async function sendNdaApprovalEmail({
 </body>
 </html>`,
   })
-
-  if (error) throw new Error(`Email send failed: ${JSON.stringify(error)}`)
 }
