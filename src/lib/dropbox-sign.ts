@@ -11,7 +11,7 @@ export async function sendNdaForSigning(name: string, email: string, application
     `signers[0][name]=${encodeURIComponent(name)}`,
     `file_urls[0]=${encodeURIComponent(ndaUrl)}`,
     `metadata[application_id]=${encodeURIComponent(applicationId)}`,
-    `test_mode=1`,
+    `test_mode=0`,
   ].join('&')
 
   const auth = Buffer.from(`${process.env.DROPBOX_SIGN_API_KEY}:`).toString('base64')
