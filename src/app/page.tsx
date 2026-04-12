@@ -66,8 +66,9 @@ export default function LandingPage() {
         .silk-wrap {
           position: absolute;
           inset: 0;
-          overflow: hidden;
           pointer-events: none;
+          -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 55%, black 30%, transparent 75%);
+          mask-image: radial-gradient(ellipse 75% 75% at 50% 55%, black 30%, transparent 75%);
         }
 
         .silk {
