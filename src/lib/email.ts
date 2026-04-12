@@ -2,10 +2,12 @@ import nodemailer from 'nodemailer'
 
 function makeTransporter() {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
+      user: 'resend',
+      pass: process.env.RESEND_API_KEY,
     },
   })
 }
@@ -31,7 +33,7 @@ export async function sendBetaReportNotification({
   const transporter = makeTransporter()
 
   await transporter.sendMail({
-    from: `E.V.E. Studio <${process.env.GMAIL_USER}>`,
+    from: 'E.V.E. Studio <noreply@theevestudio.io>',
     to: 'alana.productions.co@gmail.com',
     subject: `[Beta Report] ${typeLabel[type] ?? type} from ${reporterEmail ?? 'unknown user'}`,
     html: `
@@ -86,7 +88,7 @@ export async function sendNdaApprovalEmail({
   const transporter = makeTransporter()
 
   await transporter.sendMail({
-    from: `E.V.E. Studio <${process.env.GMAIL_USER}>`,
+    from: 'E.V.E. Studio <noreply@theevestudio.io>',
     to: email,
     subject: "You're approved — sign your NDA to activate access",
     html: `
