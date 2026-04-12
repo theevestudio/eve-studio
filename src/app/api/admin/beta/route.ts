@@ -35,11 +35,34 @@ export async function POST(req: Request) {
   }
 
   const { id, action } = await req.json()
-  if (!id || !['approved', 'rejected'].includes(action)) {
+  if (!id || !['approved', 'rejected', 'resend_nda'].includes(action)) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
   const supabase = createAdminClient()
+
+  // Resend NDA — look up existing application and resend
+  if (action === 'resend_nda') {
+    const { data: app, error } = await supabase
+      .from('beta_applications')
+      .select('name, email')
+      .eq('id', id)
+      .single()
+
+    if (error || !app) return NextResponse.json({ error: 'Application not found' }, { status: 404 })
+
+    try {
+      const signatureRequestId = await sendNdaForSigning(app.name, app.email, id)
+      await supabase
+        .from('beta_applications')
+        .update({ nda_sent_at: new Date().toISOString(), signature_request_id: signatureRequestId })
+        .eq('id', id)
+      return NextResponse.json({ success: true, nda_sent: true })
+    } catch (err) {
+      console.error('[NDA resend error]', err)
+      return NextResponse.json({ success: false, nda_error: String(err) }, { status: 500 })
+    }
+  }
 
   // Update status
   const { data: app, error } = await supabase
