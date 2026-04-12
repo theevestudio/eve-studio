@@ -11,7 +11,7 @@ export async function sendNdaApprovalEmail({
 }) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const { error } = await resend.emails.send({
-    from: 'E.V.E. Studio <onboarding@resend.dev>',
+    from: 'E.V.E. Studio <noreply@theevestudio.io>',
     to: email,
     subject: 'You\'re approved — sign your NDA to activate access',
     html: `
