@@ -87,7 +87,7 @@ function SignNdaContent() {
             <p style={{ margin: '0 0 24px', fontSize: 15, color: '#888', lineHeight: 1.6 }}>
               Your NDA is already on file. Head to the app and log in.
             </p>
-            <a href="https://www.theevestudio.io/auth/login" style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#000', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
+            <a href="https://theevestudio.io/auth/login" style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#000', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
               Go to login →
             </a>
           </div>
@@ -102,7 +102,7 @@ function SignNdaContent() {
             <p style={{ margin: '0 0 32px', fontSize: 15, color: '#888', lineHeight: 1.6 }}>
               Log in with the email address you used to apply.
             </p>
-            <a href="https://www.theevestudio.io/auth/login" style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#000', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
+            <a href="https://theevestudio.io/auth/login" style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#000', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
               Log in to E.V.E. Studio →
             </a>
           </div>

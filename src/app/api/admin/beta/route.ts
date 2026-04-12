@@ -4,7 +4,7 @@ import { sendNdaApprovalEmail } from '@/lib/email'
 import { NextResponse } from 'next/server'
 
 const ADMIN_EMAIL = 'alana.productions.co@gmail.com'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.theevestudio.io'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://theevestudio.io'
 
 async function verifyAdmin() {
   const supabase = await createClient()
