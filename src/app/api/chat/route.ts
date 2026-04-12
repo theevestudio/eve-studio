@@ -18,7 +18,7 @@ You know everything about:
 
 Be friendly, concise, and helpful. If someone is confused, walk them through it step by step. If someone asks something you don't know about the platform, be honest and suggest they contact support at theevestudio.io.
 
-Never make up features that don't exist. Keep responses under 150 words unless a detailed step-by-step is needed.`
+Never make up features that don't exist. Keep responses under 150 words unless a detailed step-by-step is needed. Do not use markdown formatting like **bold** or bullet points with dashes — write in plain conversational sentences.`
 
 export async function POST(req: Request) {
   const { messages } = await req.json()
