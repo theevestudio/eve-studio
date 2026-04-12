@@ -133,6 +133,23 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Admin — only visible to you */}
+        {profile?.email === 'alana.productions.co@gmail.com' && (
+          <div className="mb-4">
+            <p className="text-xs text-violet-400 font-semibold uppercase tracking-widest mb-2">Admin</p>
+            <button
+              onClick={() => router.push('/admin/beta')}
+              className="w-full bg-zinc-900 border border-violet-800/50 hover:border-violet-600 transition rounded-xl p-4 text-left flex items-center justify-between"
+            >
+              <div>
+                <p className="font-semibold text-violet-300">Beta Applications</p>
+                <p className="text-zinc-500 text-sm">Review and approve beta testers</p>
+              </div>
+              <span className="text-violet-500 text-lg">→</span>
+            </button>
+          </div>
+        )}
+
         {/* Quick actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
