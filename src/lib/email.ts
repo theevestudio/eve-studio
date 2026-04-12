@@ -1,5 +1,79 @@
 import nodemailer from 'nodemailer'
 
+function makeTransporter() {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  })
+}
+
+export async function sendBetaReportNotification({
+  reporterEmail,
+  type,
+  description,
+  page,
+}: {
+  reporterEmail: string | null
+  type: string
+  description: string
+  page: string | null
+}) {
+  const typeLabel: Record<string, string> = {
+    bug:            '🐛 Bug',
+    plugin_error:   '⚠️ Plugin Error',
+    recommendation: '💡 Recommendation',
+    other:          '📝 Other',
+  }
+
+  const transporter = makeTransporter()
+
+  await transporter.sendMail({
+    from: `E.V.E. Studio <${process.env.GMAIL_USER}>`,
+    to: 'alana.productions.co@gmail.com',
+    subject: `[Beta Report] ${typeLabel[type] ?? type} from ${reporterEmail ?? 'unknown user'}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;">
+          <tr>
+            <td style="padding:28px 40px 20px;border-bottom:1px solid #1a1a1a;">
+              <p style="margin:0;font-size:12px;font-weight:600;letter-spacing:0.15em;color:#888;text-transform:uppercase;">Beta Program</p>
+              <h1 style="margin:10px 0 0;font-size:22px;font-weight:600;color:#fff;">${typeLabel[type] ?? type}</h1>
+              <p style="margin:6px 0 0;font-size:13px;color:#555;">
+                From: ${reporterEmail ?? 'unknown'}
+                ${page ? `&nbsp;·&nbsp; Page: <span style="font-family:monospace;color:#888;">${page}</span>` : ''}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 40px;">
+              <p style="margin:0;font-size:15px;color:#ccc;line-height:1.7;white-space:pre-wrap;">${description}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 40px 28px;border-top:1px solid #1a1a1a;">
+              <a href="https://theevestudio.io/admin/beta/reports" style="display:inline-block;padding:10px 22px;background:#7c3aed;border-radius:8px;font-size:13px;font-weight:600;color:#fff;text-decoration:none;">
+                View in admin →
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
+  })
+}
+
 export async function sendNdaApprovalEmail({
   name,
   email,
@@ -9,18 +83,10 @@ export async function sendNdaApprovalEmail({
   email: string
   signingUrl: string
 }) {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.resend.com',
-    port: 465,
-    secure: true,
-    auth: {
-      user: 'resend',
-      pass: process.env.RESEND_API_KEY,
-    },
-  })
+  const transporter = makeTransporter()
 
   await transporter.sendMail({
-    from: 'E.V.E. Studio <noreply@theevestudio.io>',
+    from: `E.V.E. Studio <${process.env.GMAIL_USER}>`,
     to: email,
     subject: "You're approved — sign your NDA to activate access",
     html: `
