@@ -1,5 +1,5 @@
 export async function sendNdaForSigning(name: string, email: string, applicationId: string): Promise<string> {
-  const ndaUrl = 'https://theevestudio.io/E.V.E._studio__beta_tester_nda.pdf'
+  const ndaUrl = 'https://www.theevestudio.io/E.V.E._studio__beta_tester_nda.pdf'
 
   const params = new URLSearchParams()
   params.append('title', 'E.V.E. Studio Beta Tester NDA')
