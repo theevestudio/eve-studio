@@ -16,15 +16,13 @@ export default function LandingPage() {
         @keyframes eve-pulse {
           0%, 100% {
             filter:
-              drop-shadow(0 0 30px rgba(139,92,246,0.7))
-              drop-shadow(0 0 70px rgba(124,58,237,0.4))
-              drop-shadow(0 0 120px rgba(109,40,217,0.2));
+              drop-shadow(0 0 20px rgba(139,92,246,0.7))
+              drop-shadow(0 0 45px rgba(124,58,237,0.4));
           }
           50% {
             filter:
-              drop-shadow(0 0 60px rgba(167,139,250,1))
-              drop-shadow(0 0 120px rgba(139,92,246,0.7))
-              drop-shadow(0 0 200px rgba(124,58,237,0.4));
+              drop-shadow(0 0 40px rgba(167,139,250,1))
+              drop-shadow(0 0 80px rgba(139,92,246,0.6));
           }
         }
 
@@ -40,7 +38,12 @@ export default function LandingPage() {
           100% { background-position: 200% center; }
         }
 
-        .eve-pulse { animation: eve-pulse 2.5s ease-in-out infinite; }
+        .eve-pulse {
+          animation: eve-pulse 2.5s ease-in-out infinite;
+          will-change: filter;
+          transform: translateZ(0);
+          backface-visibility: hidden;
+        }
 
         .cta-primary {
           background: linear-gradient(
