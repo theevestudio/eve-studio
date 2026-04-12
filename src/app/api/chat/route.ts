@@ -44,6 +44,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ reply: text })
   } catch (err: any) {
     console.error('[EVE Chat error]', err?.message || err)
-    return NextResponse.json({ error: err?.message || 'Unknown error', status: err?.status }, { status: 500 })
+    return NextResponse.json({ error: 'E.V.E. is unavailable right now. Please try again.' }, { status: 500 })
   }
 }
