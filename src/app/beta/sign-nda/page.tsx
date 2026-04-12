@@ -1,11 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 type State = 'loading' | 'valid' | 'invalid' | 'already_signed' | 'submitting' | 'success'
 
 export default function SignNdaPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: '#555', fontFamily: 'system-ui', fontSize: 15 }}>Loading…</p></div>}>
+      <SignNdaContent />
+    </Suspense>
+  )
+}
+
+function SignNdaContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get('token') ?? ''
