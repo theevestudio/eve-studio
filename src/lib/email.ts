@@ -40,17 +40,17 @@ export async function sendNdaApprovalEmail({
                 It takes about 60 seconds — just read, type your name, and confirm. Your access goes live the moment you sign.
               </p>
               <!-- CTA Button -->
-              <table cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="border-radius:8px;background:#fff;">
-                    <a href="${signingUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#000;text-decoration:none;letter-spacing:-0.01em;">
-                      Sign my NDA &rarr;
-                    </a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:24px 0 0;font-size:13px;color:#555;line-height:1.6;">
-                This link expires in 7 days. If it expires, reply to this email and we'll send a new one.
+              <a href="${signingUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:14px 28px;background:#fff;border-radius:8px;font-size:15px;font-weight:600;color:#000;text-decoration:none;letter-spacing:-0.01em;">
+                Sign my NDA &rarr;
+              </a>
+              <p style="margin:20px 0 0;font-size:13px;color:#555;line-height:1.6;">
+                If the button doesn't open, copy and paste this link into your browser:
+              </p>
+              <p style="margin:6px 0 0;font-size:13px;line-height:1.6;word-break:break-all;">
+                <a href="${signingUrl}" style="color:#888;">${signingUrl}</a>
+              </p>
+              <p style="margin:16px 0 0;font-size:13px;color:#555;line-height:1.6;">
+                This link expires in 7 days.
               </p>
             </td>
           </tr>
