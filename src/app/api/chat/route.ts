@@ -28,11 +28,16 @@ export async function POST(req: Request) {
   }
 
   try {
+    // Anthropic requires conversation to start with role:user — strip any leading assistant messages
+    const filtered = messages.filter((m: any) => m.role === 'user' || m.role === 'assistant')
+    const startIdx = filtered.findIndex((m: any) => m.role === 'user')
+    const safeMessages = startIdx >= 0 ? filtered.slice(startIdx) : filtered
+
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 500,
       system: SYSTEM_PROMPT,
-      messages: messages.slice(-10), // keep last 10 messages for context
+      messages: safeMessages.slice(-10),
     })
 
     const text = (response.content[0] as any).text
