@@ -159,15 +159,13 @@ export default function AdminBetaPage() {
                     ) : (
                       <span className="text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400 font-medium">NDA Not Sent</span>
                     )}
-                    {!app.nda_signed_at && (
-                      <button
-                        onClick={() => resendNda(app)}
-                        disabled={ndaSending === app.id}
-                        className="border border-violet-600 text-violet-400 hover:bg-violet-600 hover:text-white disabled:opacity-50 transition px-3 py-1.5 rounded-lg text-sm font-medium"
-                      >
-                        {ndaSending === app.id ? 'Sending...' : app.nda_sent_at ? 'Resend NDA' : 'Send NDA'}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => resendNda(app)}
+                      disabled={ndaSending === app.id}
+                      className="border border-violet-600 text-violet-400 hover:bg-violet-600 hover:text-white disabled:opacity-50 transition px-3 py-1.5 rounded-lg text-sm font-medium"
+                    >
+                      {ndaSending === app.id ? 'Sending...' : app.nda_sent_at ? 'Resend NDA' : 'Send NDA'}
+                    </button>
                   </div>
                 )}
                 {app.status === 'pending' && (
