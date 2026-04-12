@@ -10,15 +10,17 @@ export async function sendNdaApprovalEmail({
   signingUrl: string
 }) {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
+      user: 'resend',
+      pass: process.env.RESEND_API_KEY,
     },
   })
 
   await transporter.sendMail({
-    from: `E.V.E. Studio <${process.env.GMAIL_USER}>`,
+    from: 'E.V.E. Studio <noreply@theevestudio.io>',
     to: email,
     subject: "You're approved — sign your NDA to activate access",
     html: `
