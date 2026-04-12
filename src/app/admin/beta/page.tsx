@@ -55,12 +55,17 @@ export default function AdminBetaPage() {
 
   async function resendNda(app: Application) {
     setNdaSending(app.id)
-    await fetch('/api/admin/beta', {
+    const res = await fetch('/api/admin/beta', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: app.id, action: 'resend_nda' }),
     })
-    setApps(prev => prev.map(a => a.id === app.id ? { ...a, nda_sent_at: new Date().toISOString() } : a))
+    const data = await res.json()
+    if (data.success) {
+      setApps(prev => prev.map(a => a.id === app.id ? { ...a, nda_sent_at: new Date().toISOString() } : a))
+    } else {
+      alert(`Failed to send NDA: ${data.nda_error ?? 'Unknown error'}`)
+    }
     setNdaSending(null)
   }
 

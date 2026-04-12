@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   if (lookupError || !app) return NextResponse.json({ error: 'Invalid link' }, { status: 404 })
   if (app.status !== 'approved') return NextResponse.json({ error: 'Application not approved' }, { status: 403 })
   if (app.nda_signed_at) return NextResponse.json({ already_signed: true })
-  if (new Date(app.nda_token_expires_at) < new Date()) {
+  if (!app.nda_token_expires_at || new Date(app.nda_token_expires_at) < new Date()) {
     return NextResponse.json({ error: 'Link expired. Please contact us for a new one.' }, { status: 410 })
   }
 

@@ -14,7 +14,6 @@ export async function sendNdaApprovalEmail({
     from: 'E.V.E. Studio <onboarding@resend.dev>',
     to: email,
     subject: 'You\'re approved — sign your NDA to activate access',
-    clickTracking: false,
     html: `
 <!DOCTYPE html>
 <html>

@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   if (error || !data) return NextResponse.json({ valid: false, error: 'Invalid link' }, { status: 404 })
   if (data.status !== 'approved') return NextResponse.json({ valid: false, error: 'Application not approved' }, { status: 403 })
   if (data.nda_signed_at) return NextResponse.json({ valid: false, already_signed: true })
-  if (new Date(data.nda_token_expires_at) < new Date()) return NextResponse.json({ valid: false, error: 'This link has expired. Please contact us for a new one.' }, { status: 410 })
+  if (!data.nda_token_expires_at || new Date(data.nda_token_expires_at) < new Date()) return NextResponse.json({ valid: false, error: 'This link has expired. Please contact us for a new one.' }, { status: 410 })
 
   return NextResponse.json({ valid: true, name: data.name, email: data.email, application_id: data.id })
 }
