@@ -84,7 +84,7 @@ export default function AdminBetaPage() {
   )
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-10 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-black text-white px-10 py-10 max-w-7xl mx-auto w-full">
 
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Beta Applications</h1>
