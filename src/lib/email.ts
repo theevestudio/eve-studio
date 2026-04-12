@@ -43,7 +43,7 @@ export async function sendNdaApprovalEmail({
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="border-radius:8px;background:#fff;">
-                    <a href="${signingUrl}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#000;text-decoration:none;letter-spacing:-0.01em;">
+                    <a href="${signingUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#000;text-decoration:none;letter-spacing:-0.01em;">
                       Sign my NDA &rarr;
                     </a>
                   </td>

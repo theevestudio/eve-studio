@@ -62,6 +62,12 @@ export async function POST(req: Request) {
     const expires = new Date()
     expires.setDate(expires.getDate() + 7)
 
+    // Save token to DB FIRST so the link works the moment email arrives
+    await supabase
+      .from('beta_applications')
+      .update({ nda_token: token, nda_token_expires_at: expires.toISOString() })
+      .eq('id', id)
+
     try {
       await sendNdaApprovalEmail({
         name: app.name,
@@ -70,7 +76,7 @@ export async function POST(req: Request) {
       })
       await supabase
         .from('beta_applications')
-        .update({ nda_token: token, nda_token_expires_at: expires.toISOString(), nda_sent_at: new Date().toISOString() })
+        .update({ nda_sent_at: new Date().toISOString() })
         .eq('id', id)
       return NextResponse.json({ success: true, nda_sent: true })
     } catch (err) {
@@ -108,6 +114,12 @@ export async function POST(req: Request) {
     const expires = new Date()
     expires.setDate(expires.getDate() + 7)
 
+    // Save token to DB FIRST so the link works the moment email arrives
+    await supabase
+      .from('beta_applications')
+      .update({ nda_token: token, nda_token_expires_at: expires.toISOString() })
+      .eq('id', id)
+
     try {
       await sendNdaApprovalEmail({
         name: app.name,
@@ -116,7 +128,7 @@ export async function POST(req: Request) {
       })
       await supabase
         .from('beta_applications')
-        .update({ nda_token: token, nda_token_expires_at: expires.toISOString(), nda_sent_at: new Date().toISOString() })
+        .update({ nda_sent_at: new Date().toISOString() })
         .eq('id', id)
       return NextResponse.json({ success: true, nda_sent: true })
     } catch (err) {
