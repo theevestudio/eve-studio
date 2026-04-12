@@ -46,8 +46,8 @@ export async function sendNdaApprovalEmail({
               <p style="margin:20px 0 0;font-size:13px;color:#555;line-height:1.6;">
                 If the button doesn't open, copy and paste this link into your browser:
               </p>
-              <p style="margin:6px 0 0;font-size:13px;line-height:1.6;word-break:break-all;">
-                <a href="${signingUrl}" style="color:#888;">${signingUrl}</a>
+              <p style="margin:6px 0 0;font-size:13px;color:#888;line-height:1.6;word-break:break-all;">
+                ${signingUrl}
               </p>
               <p style="margin:16px 0 0;font-size:13px;color:#555;line-height:1.6;">
                 This link expires in 7 days.
