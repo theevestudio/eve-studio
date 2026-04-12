@@ -1,15 +1,18 @@
 export async function sendNdaForSigning(name: string, email: string, applicationId: string): Promise<string> {
   const ndaUrl = 'https://www.theevestudio.io/E.V.E._studio__beta_tester_nda.pdf'
 
-  const params = new URLSearchParams()
-  params.append('title', 'E.V.E. Studio Beta Tester NDA')
-  params.append('subject', 'Sign your E.V.E. Studio Beta NDA')
-  params.append('message', `Hi ${name}, your beta application has been approved! Please sign the NDA below to activate your access to E.V.E. Studio.`)
-  params.append('signers[0][email_address]', email)
-  params.append('signers[0][name]', name)
-  params.append('file_urls[0]', ndaUrl)
-  params.append('metadata[application_id]', applicationId)
-  params.append('test_mode', '1')
+  // URLSearchParams encodes brackets as %5B%5D which Dropbox Sign can't parse
+  // Build body manually so keys like signers[0][email_address] stay literal
+  const body = [
+    `title=${encodeURIComponent('E.V.E. Studio Beta Tester NDA')}`,
+    `subject=${encodeURIComponent('Sign your E.V.E. Studio Beta NDA')}`,
+    `message=${encodeURIComponent(`Hi ${name}, your beta application has been approved! Please sign the NDA below to activate your access to E.V.E. Studio.`)}`,
+    `signers[0][email_address]=${encodeURIComponent(email)}`,
+    `signers[0][name]=${encodeURIComponent(name)}`,
+    `file_urls[0]=${encodeURIComponent(ndaUrl)}`,
+    `metadata[application_id]=${encodeURIComponent(applicationId)}`,
+    `test_mode=1`,
+  ].join('&')
 
   const auth = Buffer.from(`${process.env.DROPBOX_SIGN_API_KEY}:`).toString('base64')
 
@@ -19,7 +22,7 @@ export async function sendNdaForSigning(name: string, email: string, application
       'Authorization': `Basic ${auth}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: params.toString(),
+    body,
   })
 
   if (!res.ok) {
