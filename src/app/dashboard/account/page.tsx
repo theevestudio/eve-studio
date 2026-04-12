@@ -50,10 +50,11 @@ function AccountContent() {
     setCheckingOut(priceKey)
 
     const priceMap: Record<string, string> = {
-      EVE_MONTHLY: process.env.NEXT_PUBLIC_STRIPE_PRICE_EVE_MONTHLY || '',
-      TOKENS_5:    process.env.NEXT_PUBLIC_STRIPE_PRICE_TOKENS_5    || '',
-      TOKENS_15:   process.env.NEXT_PUBLIC_STRIPE_PRICE_TOKENS_15   || '',
-      TOKENS_30:   process.env.NEXT_PUBLIC_STRIPE_PRICE_TOKENS_30   || '',
+      EVE_MONTHLY:  process.env.NEXT_PUBLIC_STRIPE_PRICE_EVE_MONTHLY  || '',
+      EVE_LIFETIME: process.env.NEXT_PUBLIC_STRIPE_PRICE_EVE_LIFETIME || '',
+      TOKENS_5:     process.env.NEXT_PUBLIC_STRIPE_PRICE_TOKENS_5     || '',
+      TOKENS_15:    process.env.NEXT_PUBLIC_STRIPE_PRICE_TOKENS_15    || '',
+      TOKENS_30:    process.env.NEXT_PUBLIC_STRIPE_PRICE_TOKENS_30    || '',
     }
 
     const res = await fetch('/api/stripe/checkout', {

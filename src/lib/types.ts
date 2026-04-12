@@ -5,6 +5,8 @@ export type Profile = {
   stripe_customer_id: string | null
   eve_subscription_active: boolean
   eve_subscription_start: string | null
+  is_beta_user: boolean
+  beta_expires_at: string | null
   created_at: string
 }
 

@@ -7,6 +7,7 @@ import Image from 'next/image'
 import type { Profile, TokenBalance } from '@/lib/types'
 import FeedbackPopup from '@/components/FeedbackPopup'
 import LoadingEVE from '@/components/LoadingEVE'
+import BetaPopup from '@/components/BetaPopup'
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -65,6 +66,8 @@ export default function DashboardPage() {
       </nav>
 
       <main className="max-w-5xl mx-auto px-6 py-12">
+        <BetaPopup isBetaUser={profile?.is_beta_user ?? false} betaExpiresAt={profile?.beta_expires_at ?? null} />
+
         {/* Welcome */}
         <div className="mb-10">
           <h1 className="text-3xl font-bold">

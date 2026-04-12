@@ -51,8 +51,22 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Auto-send NDA on approval
+  // Auto-send NDA on approval + activate beta session on profile
   if (action === 'approved' && app) {
+    // Set beta session on the user's profile (3 months from now)
+    const betaExpiresAt = new Date()
+    betaExpiresAt.setMonth(betaExpiresAt.getMonth() + 3)
+
+    await supabase
+      .from('profiles')
+      .update({
+        is_beta_user: true,
+        eve_subscription_active: true,
+        eve_subscription_start: new Date().toISOString(),
+        beta_expires_at: betaExpiresAt.toISOString(),
+      })
+      .eq('email', app.email)
+
     try {
       const signatureRequestId = await sendNdaForSigning(app.name, app.email, id)
       await supabase
@@ -62,7 +76,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, nda_sent: true })
     } catch (err) {
       console.error('[NDA send error]', err)
-      // Still return success for the approval — NDA failure shouldn't block it
       return NextResponse.json({ success: true, nda_sent: false, nda_error: String(err) })
     }
   }

@@ -7,9 +7,15 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export const PLANS = {
   EVE_MONTHLY: {
     name: 'EVE Monthly',
-    price: 29,
+    price: 39,
     priceId: process.env.STRIPE_PRICE_EVE_MONTHLY!,
     description: 'Full EVE plugin access + 3 free VIBE tokens',
+  },
+  EVE_LIFETIME: {
+    name: 'EVE Monthly — Founding Member Rate',
+    price: 29,
+    priceId: process.env.STRIPE_PRICE_EVE_LIFETIME!,
+    description: 'Locked-in $29/month forever. Beta tester exclusive.',
   },
 }
 
