@@ -28,12 +28,10 @@ export default function LandingPage() {
           }
         }
 
-        /* Silky vertical flows */
-        @keyframes silk-rise {
-          0%   { transform: translateY(100%); opacity: 0; }
-          15%  { opacity: 1; }
-          85%  { opacity: 1; }
-          100% { transform: translateY(-100%); opacity: 0; }
+        /* Ambient glow pulse */
+        @keyframes glow-breathe {
+          0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(-50%) scale(1); }
+          50%       { opacity: 0.9; transform: translateX(-50%) translateY(-50%) scale(1.12); }
         }
 
         /* CTA shimmer */
@@ -63,32 +61,17 @@ export default function LandingPage() {
           box-shadow: 0 0 36px rgba(139,92,246,0.7), 0 0 80px rgba(124,58,237,0.35);
         }
 
-        .silk-wrap {
+        .ambient-glow {
           position: absolute;
-          inset: 0;
+          left: 50%;
+          top: 50%;
+          transform: translateX(-50%) translateY(-50%);
+          width: 480px;
+          height: 480px;
+          border-radius: 50%;
+          background: radial-gradient(ellipse at center, rgba(139,92,246,0.35) 0%, rgba(124,58,237,0.18) 35%, rgba(109,40,217,0.06) 65%, transparent 100%);
           pointer-events: none;
-          -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 55%, black 30%, transparent 75%);
-          mask-image: radial-gradient(ellipse 75% 75% at 50% 55%, black 30%, transparent 75%);
-        }
-
-        .silk {
-          position: absolute;
-          bottom: 0;
-          width: 1px;
-          height: 60%;
-          background: linear-gradient(to top, transparent, rgba(139,92,246,0.6), rgba(167,139,250,0.8), rgba(139,92,246,0.6), transparent);
-          animation: silk-rise linear infinite;
-          filter: blur(0.5px);
-        }
-
-        .silk-wide {
-          position: absolute;
-          bottom: 0;
-          width: 3px;
-          height: 45%;
-          background: linear-gradient(to top, transparent, rgba(124,58,237,0.25), rgba(139,92,246,0.35), rgba(124,58,237,0.25), transparent);
-          animation: silk-rise linear infinite;
-          filter: blur(2px);
+          animation: glow-breathe 2.5s ease-in-out infinite;
         }
       `}</style>
 
@@ -149,19 +132,8 @@ export default function LandingPage() {
 
         {/* Robot + silky background */}
         <div className="relative flex justify-center" style={{marginTop: '8px', marginBottom: '-80px'}}>
-          {/* Silk background */}
-          <div className="silk-wrap" style={{width: 440, height: 440, left: '50%', transform: 'translateX(-50%)'}}>
-            <div className="silk" style={{left:'15%', animationDuration:'6s', animationDelay:'0s', height:'55%'}} />
-            <div className="silk" style={{left:'25%', animationDuration:'8s', animationDelay:'1.5s', height:'70%'}} />
-            <div className="silk" style={{left:'38%', animationDuration:'7s', animationDelay:'0.8s', height:'60%'}} />
-            <div className="silk" style={{left:'50%', animationDuration:'9s', animationDelay:'2.2s', height:'80%'}} />
-            <div className="silk" style={{left:'62%', animationDuration:'6.5s', animationDelay:'0.4s', height:'65%'}} />
-            <div className="silk" style={{left:'75%', animationDuration:'8.5s', animationDelay:'1.1s', height:'55%'}} />
-            <div className="silk" style={{left:'85%', animationDuration:'7.5s', animationDelay:'3s', height:'70%'}} />
-            <div className="silk-wide" style={{left:'30%', animationDuration:'11s', animationDelay:'0s'}} />
-            <div className="silk-wide" style={{left:'55%', animationDuration:'13s', animationDelay:'2s'}} />
-            <div className="silk-wide" style={{left:'72%', animationDuration:'10s', animationDelay:'1s'}} />
-          </div>
+          {/* Ambient glow background */}
+          <div className="ambient-glow" />
 
           {/* Robot */}
           <div className="eve-pulse relative z-10">
