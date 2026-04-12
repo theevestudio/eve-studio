@@ -138,12 +138,25 @@ function AccountContent() {
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-4">EVE Subscription</h2>
 
         {profile?.eve_subscription_active ? (
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-emerald-400">Active — $39/month</p>
-              <p className="text-zinc-500 text-sm mt-1">Full plugin access · renews monthly</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-emerald-400">Active — $39/month</p>
+                <p className="text-zinc-500 text-sm mt-1">Full plugin access · renews monthly</p>
+              </div>
+              <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full">Active</span>
             </div>
-            <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full">Active</span>
+            <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4">
+              <p className="text-sm font-semibold text-white mb-1">E.V.E. Premiere Pro Plugin</p>
+              <p className="text-xs text-zinc-400 mb-3">Download and load via Adobe UXP Developer Tool in Premiere Pro.</p>
+              <a
+                href="/eve-plugin.zip"
+                download="eve-plugin.zip"
+                className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 transition text-white font-semibold px-4 py-2 rounded-lg text-sm"
+              >
+                ↓ Download Plugin
+              </a>
+            </div>
           </div>
         ) : (
           <div>

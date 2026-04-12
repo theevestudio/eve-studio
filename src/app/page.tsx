@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import Image from 'next/image'
 import AnimatedDashboard from '@/components/AnimatedDashboard'
 
@@ -90,6 +91,19 @@ export default function LandingPage() {
         }
       `}</style>
 
+      {/* Beta announcement bar */}
+      <div className="bg-violet-950/60 border-b border-violet-800/40 text-center py-2.5 px-4">
+        <p className="text-violet-300 text-sm">
+          E.V.E. is in <span className="font-bold text-violet-200">closed beta</span> —{' '}
+          <button
+            onClick={() => document.getElementById('beta')?.scrollIntoView({ behavior: 'smooth' })}
+            className="underline text-violet-200 hover:text-white transition font-medium"
+          >
+            apply for founding member access
+          </button>
+        </p>
+      </div>
+
       {/* Nav — desktop: single row | mobile: logo top, buttons bottom */}
       <nav className="border-b border-zinc-900">
         {/* Desktop */}
@@ -98,6 +112,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-6">
             <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="text-zinc-300 hover:text-white transition text-xl">Features</button>
             <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-zinc-300 hover:text-white transition text-xl">Pricing</button>
+            <button onClick={() => document.getElementById('beta')?.scrollIntoView({ behavior: 'smooth' })} className="text-violet-400 hover:text-violet-300 transition text-xl font-semibold">Beta ✦</button>
             <button onClick={() => router.push('/auth/login')} className="text-zinc-300 hover:text-white transition text-xl">Sign in</button>
             <button onClick={() => router.push('/auth/signup')} className="cta-primary text-white font-bold px-6 py-3 rounded-lg text-lg">Get started free</button>
           </div>
@@ -254,6 +269,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Beta */}
+      <BetaSection />
+
       {/* Pricing */}
       <section id="pricing" className="max-w-5xl mx-auto px-6 mb-24">
         <h2 className="text-3xl font-bold text-center mb-4">Simple pricing</h2>
@@ -294,9 +312,9 @@ export default function LandingPage() {
                 <li>✓ Early access to new features</li>
               </ul>
             </div>
-            <button onClick={() => router.push('/auth/signup')} className="w-full bg-violet-600 hover:bg-violet-500 transition text-white font-bold py-3 rounded-xl text-sm">
-              Start with EVE
-            </button>
+            <BetaGatedButton className="w-full bg-violet-600 hover:bg-violet-500 transition text-white font-bold py-3 rounded-xl text-sm">
+              Apply for Beta Access
+            </BetaGatedButton>
           </div>
 
           {/* Tokens */}
@@ -313,9 +331,9 @@ export default function LandingPage() {
                 <li>✓ Available on any plan</li>
               </ul>
             </div>
-            <button onClick={() => router.push('/auth/signup')} className="w-full border border-zinc-700 hover:border-violet-500 transition text-white font-semibold py-3 rounded-xl text-sm">
-              Buy tokens
-            </button>
+            <BetaGatedButton className="w-full border border-zinc-700 hover:border-violet-500 transition text-white font-semibold py-3 rounded-xl text-sm">
+              Apply for Beta Access
+            </BetaGatedButton>
           </div>
         </div>
       </section>
@@ -349,6 +367,123 @@ export default function LandingPage() {
       </footer>
 
     </div>
+  )
+}
+
+function BetaGatedButton({ className, children }: { className: string; children: React.ReactNode }) {
+  const [show, setShow] = useState(false)
+  return (
+    <>
+      <button className={className} onClick={() => setShow(true)}>{children}</button>
+      {show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4" onClick={() => setShow(false)}>
+          <div className="bg-zinc-900 border border-violet-700 rounded-2xl p-8 max-w-sm w-full text-center" onClick={e => e.stopPropagation()}>
+            <span className="inline-block bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-4">Beta Mode</span>
+            <h3 className="text-xl font-bold mb-3">E.V.E. is in closed beta.</h3>
+            <p className="text-zinc-400 text-sm mb-6">Paid plans aren&apos;t open yet. Apply for founding member access — it&apos;s free during beta, and you lock in a discounted rate at launch.</p>
+            <button
+              onClick={() => { setShow(false); document.getElementById('beta')?.scrollIntoView({ behavior: 'smooth' }) }}
+              className="w-full cta-primary text-white font-bold py-3 rounded-xl text-sm mb-3"
+            >
+              Apply for Beta Access
+            </button>
+            <button onClick={() => setShow(false)} className="text-zinc-600 text-xs hover:text-zinc-400 transition">Close</button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+function BetaSection() {
+  const [form, setForm] = useState({ name: '', email: '', use_case: '' })
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'already' | 'error'>('idle')
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.name.trim() || !form.email.trim() || status === 'loading') return
+    setStatus('loading')
+    try {
+      const res = await fetch('/api/beta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (data.already) setStatus('already')
+      else if (data.success) setStatus('success')
+      else setStatus('error')
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <section id="beta" className="max-w-3xl mx-auto px-6 mb-24">
+      <div className="relative bg-zinc-950 border border-violet-800/50 rounded-2xl px-8 py-12 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 70%)'}} />
+
+        <div className="relative z-10 text-center mb-8">
+          <span className="inline-block bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-5">Now in Beta</span>
+          <h2 className="text-3xl font-bold mb-3">Be a Founding Member.</h2>
+          <p className="text-zinc-400 max-w-lg mx-auto mb-2">Full access — free while we&apos;re in beta. No card, no commitment.</p>
+          <p className="text-zinc-500 text-sm">Founding members lock in a discounted rate forever when we launch. Spots are limited — we review every application personally.</p>
+        </div>
+
+        {status === 'success' && (
+          <div className="text-center bg-violet-950/50 border border-violet-700 rounded-xl px-6 py-6 text-violet-300 font-medium">
+            Application received. We&apos;ll review it and reach out soon — welcome to the crew.
+          </div>
+        )}
+        {status === 'already' && (
+          <div className="text-center bg-zinc-900 border border-zinc-700 rounded-xl px-6 py-4 text-zinc-400">
+            You&apos;re already on the list. We&apos;ve got you.
+          </div>
+        )}
+        {status === 'error' && (
+          <div className="text-center bg-red-950/40 border border-red-800 rounded-xl px-6 py-4 text-red-400 text-sm">
+            Something went wrong — try again or reach out at theevestudio.io
+          </div>
+        )}
+
+        {(status === 'idle' || status === 'loading') && (
+          <form onSubmit={submit} className="max-w-md mx-auto space-y-3">
+            <input
+              type="text"
+              placeholder="Your full name"
+              value={form.name}
+              onChange={e => setForm(f => ({...f, name: e.target.value}))}
+              required
+              className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition placeholder-zinc-600"
+            />
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={form.email}
+              onChange={e => setForm(f => ({...f, email: e.target.value}))}
+              required
+              className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition placeholder-zinc-600"
+            />
+            <textarea
+              placeholder="How do you plan to use E.V.E.? (optional — but it helps)"
+              value={form.use_case}
+              onChange={e => setForm(f => ({...f, use_case: e.target.value}))}
+              rows={3}
+              className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition placeholder-zinc-600 resize-none"
+            />
+            <button
+              type="submit"
+              disabled={status === 'loading'}
+              className="w-full cta-primary text-white font-bold px-6 py-3 rounded-xl text-sm disabled:opacity-50"
+            >
+              {status === 'loading' ? 'Submitting...' : 'Apply for Beta Access'}
+            </button>
+          </form>
+        )}
+
+        <p className="text-center text-zinc-600 text-xs mt-5">No spam. We only reach out when your access is ready.</p>
+      </div>
+    </section>
   )
 }
 

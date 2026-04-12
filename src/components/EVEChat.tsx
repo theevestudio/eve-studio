@@ -5,10 +5,39 @@ import Image from 'next/image'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
+function renderMessage(content: string) {
+  const lines = content.split('\n').filter(l => l.trim() !== '')
+  return (
+    <div className="space-y-1">
+      {lines.map((line, i) => {
+        const numbered = line.match(/^(\d+)\.\s+(.+)/)
+        const bullet = line.match(/^[-•]\s+(.+)/)
+        if (numbered) {
+          return (
+            <div key={i} className="flex gap-2">
+              <span className="text-violet-400 font-bold shrink-0">{numbered[1]}.</span>
+              <span>{numbered[2]}</span>
+            </div>
+          )
+        }
+        if (bullet) {
+          return (
+            <div key={i} className="flex gap-2">
+              <span className="text-violet-400 shrink-0">•</span>
+              <span>{bullet[1]}</span>
+            </div>
+          )
+        }
+        return <p key={i}>{line}</p>
+      })}
+    </div>
+  )
+}
+
 export default function EVEChat() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hey! I'm E.V.E. — ask me anything about the platform, your workflow, or how to get the most out of VIBE and the Premiere plugin." }
+    { role: 'assistant', content: "Hey, I'm E.V.E. What do you need?" }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -106,7 +135,7 @@ export default function EVEChat() {
                     ? 'bg-violet-600 text-white rounded-br-sm'
                     : 'bg-zinc-800 text-zinc-200 rounded-bl-sm'
                 }`}>
-                  {msg.content}
+                  {msg.role === 'assistant' ? renderMessage(msg.content) : msg.content}
                 </div>
               </div>
             ))}
