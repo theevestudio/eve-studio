@@ -7,6 +7,8 @@ export type Profile = {
   eve_subscription_start: string | null
   is_beta_user: boolean
   beta_expires_at: string | null
+  analytics_consent: boolean
+  analytics_consent_at: string | null
   created_at: string
 }
 

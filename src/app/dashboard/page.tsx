@@ -8,11 +8,46 @@ import type { Profile, TokenBalance } from '@/lib/types'
 import FeedbackPopup from '@/components/FeedbackPopup'
 import LoadingEVE from '@/components/LoadingEVE'
 import BetaPopup from '@/components/BetaPopup'
+import BetaConsentGate from '@/components/BetaConsentGate'
+import BetaDashboard from '@/components/BetaDashboard'
+
+type PreviewMode = 'actual' | 'beta' | 'user'
+
+const ADMIN_EMAIL = 'alana.productions.co@gmail.com'
+
+function AdminPreviewBar({ mode, onChange }: { mode: PreviewMode; onChange: (m: PreviewMode) => void }) {
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-zinc-950 border-b border-violet-900/60 px-4 py-1.5 flex items-center gap-3">
+      <span className="text-xs text-violet-500 font-bold uppercase tracking-widest shrink-0">Preview</span>
+      <div className="flex gap-1">
+        {([
+          { value: 'actual', label: 'Admin' },
+          { value: 'beta',   label: 'Beta User' },
+          { value: 'user',   label: 'Regular User' },
+        ] as { value: PreviewMode; label: string }[]).map(opt => (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition ${
+              mode === opt.value
+                ? 'bg-violet-600 text-white'
+                : 'text-zinc-500 hover:text-white'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      <span className="text-zinc-700 text-xs ml-auto">Only visible to you</span>
+    </div>
+  )
+}
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [tokens, setTokens] = useState<TokenBalance | null>(null)
   const [loading, setLoading] = useState(true)
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('actual')
   const router = useRouter()
   const supabase = createClient()
 
@@ -49,8 +84,50 @@ export default function DashboardPage() {
     )
   }
 
+  const isAdmin = profile?.email === ADMIN_EMAIL
+  const bar = isAdmin ? <AdminPreviewBar mode={previewMode} onChange={setPreviewMode} /> : null
+  const barOffset = isAdmin ? 'pt-9' : ''
+
+  // Resolve which view to show
+  const effectiveBeta = previewMode === 'beta' || (previewMode === 'actual' && profile?.is_beta_user)
+  const needsConsent  = previewMode === 'actual' && profile?.is_beta_user && !profile?.analytics_consent
+
+  // Consent gate (only in actual mode — skip when previewing)
+  if (needsConsent) {
+    return (
+      <>
+        {bar}
+        <div className={barOffset}>
+          <BetaConsentGate
+            onAccept={() => setProfile(prev => prev ? { ...prev, analytics_consent: true } : prev)}
+          />
+        </div>
+      </>
+    )
+  }
+
+  // Beta dashboard
+  if (effectiveBeta) {
+    return (
+      <>
+        {bar}
+        <div className={barOffset}>
+          <BetaDashboard
+            profile={profile!}
+            tokens={tokens}
+            onSignOut={handleSignOut}
+          />
+        </div>
+      </>
+    )
+  }
+
+  // Regular (non-beta) dashboard
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
+      {bar}
+      <div className={barOffset}>
+        <div className="min-h-screen bg-black text-white">
       {/* Navbar */}
       <nav className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
         <Image src="/logo-full.png" alt="The E.V.E. Studio" width={160} height={45} />
@@ -185,7 +262,9 @@ export default function DashboardPage() {
           </button>
         </div>
       </main>
-      <FeedbackPopup />
-    </div>
+          <FeedbackPopup />
+        </div>
+      </div>
+    </>
   )
 }
