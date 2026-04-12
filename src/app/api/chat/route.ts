@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 500,
       system: SYSTEM_PROMPT,
       messages: messages.slice(-10), // keep last 10 messages for context
@@ -37,7 +37,8 @@ export async function POST(req: Request) {
 
     const text = (response.content[0] as any).text
     return NextResponse.json({ reply: text })
-  } catch {
+  } catch (err: any) {
+    console.error('[EVE Chat error]', err?.message || err)
     return NextResponse.json({ error: 'E.V.E. is unavailable right now. Please try again.' }, { status: 500 })
   }
 }
