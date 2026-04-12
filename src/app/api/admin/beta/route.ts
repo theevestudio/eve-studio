@@ -1,15 +1,22 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
-import { sendNdaForSigning } from '@/lib/dropbox-sign'
+import { sendNdaApprovalEmail } from '@/lib/email'
 import { NextResponse } from 'next/server'
 
 const ADMIN_EMAIL = 'alana.productions.co@gmail.com'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.theevestudio.io'
 
 async function verifyAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email !== ADMIN_EMAIL) return false
   return true
+}
+
+function generateToken(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
 // GET — list all applications
@@ -28,7 +35,7 @@ export async function GET() {
   return NextResponse.json({ applications: data })
 }
 
-// POST — approve or reject
+// POST — approve, reject, or resend NDA
 export async function POST(req: Request) {
   if (!await verifyAdmin()) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
@@ -41,7 +48,7 @@ export async function POST(req: Request) {
 
   const supabase = createAdminClient()
 
-  // Resend NDA — look up existing application and resend
+  // Resend NDA — generate a fresh token and re-email
   if (action === 'resend_nda') {
     const { data: app, error } = await supabase
       .from('beta_applications')
@@ -51,11 +58,19 @@ export async function POST(req: Request) {
 
     if (error || !app) return NextResponse.json({ error: 'Application not found' }, { status: 404 })
 
+    const token = generateToken()
+    const expires = new Date()
+    expires.setDate(expires.getDate() + 7)
+
     try {
-      const signatureRequestId = await sendNdaForSigning(app.name, app.email, id)
+      await sendNdaApprovalEmail({
+        name: app.name,
+        email: app.email,
+        signingUrl: `${APP_URL}/beta/sign-nda?token=${token}`,
+      })
       await supabase
         .from('beta_applications')
-        .update({ nda_sent_at: new Date().toISOString(), signature_request_id: signatureRequestId })
+        .update({ nda_token: token, nda_token_expires_at: expires.toISOString(), nda_sent_at: new Date().toISOString() })
         .eq('id', id)
       return NextResponse.json({ success: true, nda_sent: true })
     } catch (err) {
@@ -74,9 +89,8 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Auto-send NDA on approval + activate beta session on profile
+  // On approval: activate beta profile + send NDA signing email
   if (action === 'approved' && app) {
-    // Set beta session on the user's profile (3 months from now)
     const betaExpiresAt = new Date()
     betaExpiresAt.setMonth(betaExpiresAt.getMonth() + 3)
 
@@ -90,11 +104,19 @@ export async function POST(req: Request) {
       })
       .eq('email', app.email)
 
+    const token = generateToken()
+    const expires = new Date()
+    expires.setDate(expires.getDate() + 7)
+
     try {
-      const signatureRequestId = await sendNdaForSigning(app.name, app.email, id)
+      await sendNdaApprovalEmail({
+        name: app.name,
+        email: app.email,
+        signingUrl: `${APP_URL}/beta/sign-nda?token=${token}`,
+      })
       await supabase
         .from('beta_applications')
-        .update({ nda_sent_at: new Date().toISOString(), signature_request_id: signatureRequestId })
+        .update({ nda_token: token, nda_token_expires_at: expires.toISOString(), nda_sent_at: new Date().toISOString() })
         .eq('id', id)
       return NextResponse.json({ success: true, nda_sent: true })
     } catch (err) {

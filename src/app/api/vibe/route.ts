@@ -38,6 +38,17 @@ export async function POST(req: Request) {
 
   if (!theme) return NextResponse.json({ error: 'Theme not found' }, { status: 404 })
 
+  // Load dynamic framework (auto-updated monthly by cron, falls back to hardcoded defaults)
+  const { data: vibeConfig } = await admin
+    .from('vibe_config')
+    .select('hook_framework, platform_signals, virality_rubric')
+    .eq('id', 1)
+    .single()
+
+  const hookFramework = vibeConfig?.hook_framework ?? DEFAULT_HOOK_FRAMEWORK
+  const platformSignals = vibeConfig?.platform_signals ?? DEFAULT_PLATFORM_SIGNALS
+  const viralityRubric = vibeConfig?.virality_rubric ?? DEFAULT_VIRALITY_RUBRIC
+
   // Build prompt
   const themeContext = buildThemeContext(theme)
 
@@ -59,24 +70,34 @@ CLIENT BRAND PROFILE:
 ${themeContext}
 ${customInstructions ? `\nCUSTOM INSTRUCTIONS (take priority):\n${customInstructions}` : ''}
 
+${hookFramework}
+
+${platformSignals}
+
+${viralityRubric}
+
 Output a JSON array of exactly ${count} script objects. Each object must have:
 {
   "title": "short descriptive title",
   "hook": "the opening line — first 3 seconds, must stop the scroll",
   "body": ["line 1", "line 2", "line 3", "..."],
   "cta": "clear call to action",
-  "hook_type": "one of: Question, Bold statement, Story open, Contrast, Curiosity gap, Direct offer",
+  "hook_type": "one of: Educational, Storytelling, Myth Busting, Comparison, Authority/Proof, Curiosity Gap, Pain Point, Controversy, Pattern Interrupt, Day in the Life",
   "virality_score": number 1-10,
   "duration_estimate": "e.g. 30s, 45s, 60s",
-  "b_roll_notes": ["visual suggestion 1", "visual suggestion 2"]
+  "b_roll_notes": ["visual suggestion 1", "visual suggestion 2"],
+  "algorithm_notes": "1-2 sentences explaining why this script is built to perform algorithmically — which engagement triggers are present and what platform signals it activates"
 }
 
 Rules:
 - Hooks must be specific and punchy — no generic openers
-- Body lines should be short and punchy (3-8 words each ideal)
+- Body lines should be short and punchy (3-8 words each ideal) — every line must earn its place or it kills watch-through
 - Scripts should feel native to the client's platforms and audience
 - Vary hook types across the batch
-- No fluff, no filler — every line earns its place`
+- Build at least 2 engagement triggers into every script (share, save, comment, follow, watch-through)
+- Score virality honestly using the algorithm rubric — most scripts should land 6-8, only scripts with 3+ engagement triggers and a clear share moment earn 9-10
+- Target 15-35s scripts for max completion rates unless the topic genuinely requires more
+- No fluff, no filler — dead lines destroy watch-through rates and kill algorithmic reach`
 
   let parsed: any[]
   try {
@@ -143,6 +164,42 @@ Rules:
 
   return NextResponse.json({ scripts: savedScripts!, batch_id, new_balance: balance.balance - count })
 }
+
+// ─── VIBE defaults ────────────────────────────────────────────────────────────
+// These are used when vibe_config has not been seeded or the DB read fails.
+// The monthly cron job at /api/cron/vibe-update overwrites the DB copy with
+// research-backed updates — these are just the fallback.
+
+const DEFAULT_HOOK_FRAMEWORK = `HOOK FRAMEWORK LIBRARY — Pick the best fit for each script and fill in specifics from the client profile:
+- Educational: "Here's exactly how to [result]" / "It took me 10 years to learn this, I'll teach you in 1 minute" / "Everyone tells you to [X] but never shows you how" / "In 60 seconds I'm going to teach you more about [X] than you've learned in your entire life"
+- Storytelling: "X years ago I [decision/struggle/pain point]" / "I started [thing] at [age] with [nothing]" / "I don't have a backup plan so this kind of needs to work" / "I did everything right. Here's what happened."
+- Myth Busting: "Everything you know about [X] is wrong" / "Let me de-influence you from [X]" / "They said [famous belief]. That's a lie." / "More [target audience] need to hear this — [common belief] will NOT [result]"
+- Comparison: "This vs this — same [metric], completely different [result]" / "Cheap vs. expensive [X]" / "[Before state] to [after state] in [timeframe]" / "This group did [X] and this group didn't — here's what happened"
+- Authority/Proof: "My client went from [before] to [after] in [time]" / "I [dream result] in the past [time], here's proof" / "Just [one thing] took my client from [before] to [after]"
+- Curiosity Gap: "The reason your [X] isn't working is..." / "Why is nobody talking about [X]?" / "There is one thing above all that sets the top [title] apart from everyone else" / "The lack of [studies/talk] on [X] isn't because it doesn't work, it's because..."
+- Pain Point: "If you have [pain point 1], [pain point 2], and [pain point 3] — you might be doing [X] wrong" / "Stop [action] if you actually want [result]" / "Do you feel [pain point] no matter what you do?"
+- Controversy: "This may be controversial but [hot take]" / "Not to flex, but I'm pretty good at [niche]" / "I do not believe in [common belief], I believe in [your belief]" / "Hot take: [common thing] is the worst thing you can do for [result]"
+- Pattern Interrupt: "Don't touch this." / "That is crazy." / "So I messed up." / "Apparently if you…" / Ultra-short incomplete sentence that forces the viewer to stop and watch
+- Day in the Life: "Day in the life of a [title] — [specific edition]" / "Come with me to [action] as a [title]" / "This is what an average day of a [title] looks like"`
+
+const DEFAULT_PLATFORM_SIGNALS = `PLATFORM ALGORITHM SIGNALS — what each platform rewards (apply when scoring):
+TikTok: Shares are the #1 signal. Every video is tested on ~200 viewers first — 70%+ completion rate unlocks 3x broader reach. Algorithm ranks: Shares > Comments > Likes. Videos tested hard in first 3 hours.
+Instagram Reels: DM sends are the #1 distribution signal. Saves drive non-follower reach. Watch-through rate is critical. Captions are read by the algorithm like blog posts.
+YouTube Shorts: 15-35s is the optimal length for completion. 70%+ completion rate triggers promotion. Shares signal viral potential to the algorithm.
+
+ENGAGEMENT TRIGGER HIERARCHY (build at least 2 into every script):
+- SHARE TRIGGER (most powerful): Creates a "you have to see this" moment — surprising stat, relatable pain, controversial take, or genuine value someone wants to send to a friend
+- WATCH-THROUGH ARCHITECTURE: Hook opens a loop or plants a question the viewer must watch to resolve. Body lines build toward a satisfying payoff. No filler that gives permission to scroll.
+- SAVE TRIGGER: Contains a list, framework, step-by-step, or insight worth revisiting. Saves = long-term algorithmic distribution boost.
+- COMMENT TRIGGER: Sparks debate, hits a "this is literally me" moment, or asks a direct question. Comments signal strong content-viewer connection to the algorithm.
+- FOLLOW TRIGGER: Script positions the creator as someone with a distinct POV worth following for more. Weaker signal than the above but compounds over time.`
+
+const DEFAULT_VIRALITY_RUBRIC = `VIRALITY SCORE RUBRIC — score based on cumulative algorithm alignment:
+- 9-10: Proven viral framework + specific numbers/details/names + clear share trigger (someone will DM this) + open loop hook that forces watch-through + at least 2 additional engagement triggers (save, comment, or follow) + directly addresses a pain or desire the audience feels right now
+- 7-8: Strong framework + has a clear share or save trigger + above-average specificity + good retention architecture (hook builds to a payoff) + relevant to the target audience's actual pain or desire
+- 5-6: Recognizable hook pattern but missing 2+ engagement triggers — generic execution, weak specificity, or body doesn't deliver on what the hook promised
+- 3-4: Vague opener with no clear hook structure, body doesn't build on the hook, no identifiable share/save/comment trigger
+- 1-2: Pure filler — could apply to any video in any niche, no reason to watch to the end, nothing worth sharing or saving`
 
 function buildThemeContext(theme: any): string {
   const lines: string[] = []

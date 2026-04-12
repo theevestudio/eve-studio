@@ -88,6 +88,10 @@ export default function AdminBetaPage() {
       <div className="max-w-7xl mx-auto px-10 py-10">
 
       <div className="mb-8">
+        <a href="/dashboard" className="inline-flex items-center gap-1.5 text-zinc-500 hover:text-white text-sm mb-5 transition">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Back to dashboard
+        </a>
         <h1 className="text-2xl font-bold mb-1">Beta Applications</h1>
         <p className="text-zinc-500 text-sm">Review and approve beta testers for E.V.E. Studio.</p>
       </div>
