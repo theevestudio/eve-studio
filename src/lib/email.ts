@@ -46,7 +46,7 @@ export async function sendNdaApprovalEmail({
               <p style="margin:0 0 32px;font-size:15px;color:#aaa;line-height:1.7;">
                 It takes about 60 seconds — just read, type your name, and confirm. Your access goes live the moment you sign.
               </p>
-              <a href="${signingUrl}" target="_blank" style="display:inline-block;padding:14px 28px;background:#fff;border-radius:8px;font-size:15px;font-weight:600;color:#000;text-decoration:none;">
+              <a href="${signingUrl}" target="_blank" style="display:inline-block;padding:14px 28px;background:#7c3aed;border-radius:8px;font-size:15px;font-weight:600;color:#fff;text-decoration:none;">
                 Sign my NDA &rarr;
               </a>
               <p style="margin:20px 0 4px;font-size:13px;color:#555;line-height:1.6;">
