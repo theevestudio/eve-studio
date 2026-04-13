@@ -106,11 +106,12 @@ export default function PluginPage() {
           <ol className="space-y-4 text-sm text-zinc-300">
             {[
               { n: 1, text: 'Download and unzip the plugin folder above.' },
-              { n: 2, text: 'Open Adobe Premiere Pro.' },
-              { n: 3, text: 'Go to Window → UXP Developer Tools.' },
-              { n: 4, text: 'Click Add Plugin, then select the manifest.json file inside the unzipped folder.' },
-              { n: 5, text: 'Click Load, then find E.V.E. under Window → Extensions in Premiere.' },
-              { n: 6, text: 'Sign in with your EVE Studio account. Your subscription is verified automatically.' },
+              { n: 2, text: 'Open Adobe Premiere Pro first — UXP Developer Tools will not work unless Premiere is already running and fully loaded.' },
+              { n: 3, text: 'Inside Premiere Pro, go to Window → UXP Developer Tools. Open it from within Premiere, not from a standalone app.' },
+              { n: 4, text: 'If you see "No applications connected" — close UXP Dev Tools, make sure Premiere is fully open, then reopen UXP Developer Tools from the Window menu inside Premiere.' },
+              { n: 5, text: 'Click Add Plugin, then select the manifest.json file inside the unzipped eve-studio-plugin folder.' },
+              { n: 6, text: 'Click Load, then find E.V.E. under Window → Extensions in Premiere.' },
+              { n: 7, text: 'Sign in with your EVE Studio account. Your subscription is verified automatically.' },
             ].map(step => (
               <li key={step.n} className="flex gap-4">
                 <span className="shrink-0 w-6 h-6 rounded-md bg-violet-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">{step.n}</span>
