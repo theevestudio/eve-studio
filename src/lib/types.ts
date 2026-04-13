@@ -65,6 +65,7 @@ export type Script = {
   hook_type: string | null
   is_edited: boolean
   is_new: boolean
+  filmed: boolean
   batch_id: string | null
   token_cost: number
   source: 'vibe' | 'imported' | null

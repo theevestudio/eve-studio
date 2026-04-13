@@ -19,6 +19,7 @@ export default function ScriptsPage() {
   const [enhancing, setEnhancing] = useState<string | null>(null)
   const [confirmRestoreId, setConfirmRestoreId] = useState<string | null>(null)
   const [activeThemeFilter, setActiveThemeFilter] = useState<string | null>(null)
+  const [filmedFilter, setFilmedFilter] = useState(false)
   const { toast, show: showToast } = useToast()
   const router = useRouter()
   const supabase = createClient()
@@ -115,6 +116,18 @@ export default function ScriptsPage() {
     setEnhancing(null)
   }
 
+  async function handleToggleFilmed(script: Script) {
+    const next = !script.filmed
+    const { error } = await supabase
+      .from('scripts')
+      .update({ filmed: next, updated_at: new Date().toISOString() })
+      .eq('id', script.id)
+    if (!error) {
+      setScripts(prev => prev.map(s => s.id === script.id ? { ...s, filmed: next } : s))
+      showToast(next ? 'Marked as filmed' : 'Marked as not filmed')
+    }
+  }
+
   if (loading) return <Shell><LoadingEVE /></Shell>
 
   // Themes that have at least one script
@@ -122,9 +135,9 @@ export default function ScriptsPage() {
     scripts.some(s => s.theme_id === th.id)
   )
 
-  const filtered = activeThemeFilter
-    ? scripts.filter(s => s.theme_id === activeThemeFilter)
-    : scripts
+  const filtered = scripts
+    .filter(s => !activeThemeFilter || s.theme_id === activeThemeFilter)
+    .filter(s => !filmedFilter || s.filmed)
 
   const activeThemeName = activeThemeFilter ? themes[activeThemeFilter]?.client_name : null
 
@@ -181,6 +194,17 @@ export default function ScriptsPage() {
               {th.client_name}
             </button>
           ))}
+          <div className="w-px bg-zinc-800 mx-1 self-stretch" />
+          <button
+            onClick={() => setFilmedFilter(f => !f)}
+            className={`text-xs px-3 py-1.5 rounded-full border transition ${
+              filmedFilter
+                ? 'bg-emerald-700 border-emerald-700 text-white'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white'
+            }`}
+          >
+            🎬 Filmed
+          </button>
         </div>
       )}
 
@@ -232,6 +256,11 @@ export default function ScriptsPage() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-semibold text-sm truncate">{script.title || 'Untitled script'}</p>
+                        {script.filmed && (
+                          <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-800/50 px-2 py-0.5 rounded-full shrink-0">
+                            🎬 Filmed
+                          </span>
+                        )}
                         {isImported && (
                           <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800/50 px-2 py-0.5 rounded-full shrink-0">
                             Imported
@@ -353,6 +382,16 @@ export default function ScriptsPage() {
                           )}
 
                           <div className="flex flex-wrap gap-3 pt-2 border-t border-zinc-800">
+                            <button
+                              onClick={() => handleToggleFilmed(script)}
+                              className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition border ${
+                                script.filmed
+                                  ? 'bg-emerald-900/40 border-emerald-700 text-emerald-400 hover:bg-emerald-900/60'
+                                  : 'border-zinc-700 text-zinc-400 hover:border-emerald-700 hover:text-emerald-400'
+                              }`}
+                            >
+                              {script.filmed ? '🎬 Filmed' : 'Mark as filmed'}
+                            </button>
                             <button
                               onClick={() => { setEditingId(script.id); setEditDraft({ ...script.script_content }) }}
                               className="text-sm text-zinc-400 hover:text-white transition border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg"
