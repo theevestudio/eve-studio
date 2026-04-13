@@ -5,7 +5,10 @@ import { createClient } from '@/lib/supabase/client'
 
 const STORAGE_KEY = 'eve_feedback_last'
 const NEVER_KEY = 'eve_feedback_never'
+const LOGIN_COUNT_KEY = 'eve_login_count'
+const SESSION_COUNTED_KEY = 'eve_session_counted'
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000
+const MIN_LOGINS = 3
 
 export default function FeedbackPopup() {
   const [visible, setVisible] = useState(false)
@@ -19,6 +22,16 @@ export default function FeedbackPopup() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (localStorage.getItem(NEVER_KEY)) return
+
+    // Count this login session once per browser session
+    if (!sessionStorage.getItem(SESSION_COUNTED_KEY)) {
+      const current = parseInt(localStorage.getItem(LOGIN_COUNT_KEY) || '0', 10)
+      localStorage.setItem(LOGIN_COUNT_KEY, String(current + 1))
+      sessionStorage.setItem(SESSION_COUNTED_KEY, '1')
+    }
+
+    const loginCount = parseInt(localStorage.getItem(LOGIN_COUNT_KEY) || '0', 10)
+    if (loginCount < MIN_LOGINS) return
 
     const last = localStorage.getItem(STORAGE_KEY)
     const shouldShow = !last || Date.now() - Number(last) > THIRTY_DAYS

@@ -61,6 +61,14 @@ export default function PluginPage() {
 
         {/* Header */}
         <div className="mb-10">
+          <div className="mb-3">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-zinc-500 hover:text-white text-sm transition"
+            >
+              ← Dashboard
+            </button>
+          </div>
           <div className="flex items-center gap-3 mb-3">
             <h1 className="text-3xl font-bold">E.V.E. Plugin</h1>
             <span className="text-xs bg-violet-900/50 text-violet-300 border border-violet-700 px-2.5 py-1 rounded-full font-semibold uppercase tracking-widest">Beta</span>
