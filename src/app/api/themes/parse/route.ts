@@ -49,15 +49,27 @@ Return ONLY the JSON object. No explanation, no markdown, no extra text.`
   try {
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1000,
+      max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     })
 
-    const raw = (response.content[0] as any).text.trim()
-    const fields = JSON.parse(raw)
+    if (!response.content?.[0] || response.content[0].type !== 'text') {
+      return NextResponse.json({ error: `Unexpected response shape: stop_reason=${response.stop_reason}` }, { status: 500 })
+    }
+
+    const raw = response.content[0].text.trim()
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+
+    let fields
+    try {
+      fields = JSON.parse(cleaned)
+    } catch {
+      return NextResponse.json({ error: `JSON parse failed. Raw response: ${cleaned.slice(0, 200)}` }, { status: 500 })
+    }
+
     return NextResponse.json({ fields })
-  } catch (err) {
+  } catch (err: any) {
     console.error('[Theme parse error]', err)
-    return NextResponse.json({ error: 'Failed to parse form. Try again.' }, { status: 500 })
+    return NextResponse.json({ error: err?.message ?? 'Unknown error calling AI' }, { status: 500 })
   }
 }
