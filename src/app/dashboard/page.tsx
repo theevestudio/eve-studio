@@ -89,8 +89,9 @@ export default function DashboardPage() {
   const barOffset = isAdmin ? 'pt-9' : ''
 
   // Resolve which view to show
-  const effectiveBeta = previewMode === 'beta' || (previewMode === 'actual' && profile?.is_beta_user)
-  const needsConsent  = previewMode === 'actual' && profile?.is_beta_user && !profile?.analytics_consent
+  // Admin in 'actual' mode always sees admin view — never auto-redirected to beta view
+  const effectiveBeta = previewMode === 'beta' || (previewMode === 'actual' && profile?.is_beta_user && !isAdmin)
+  const needsConsent  = previewMode === 'actual' && profile?.is_beta_user && !profile?.analytics_consent && !isAdmin
 
   // Consent gate (only in actual mode — skip when previewing)
   if (needsConsent) {
@@ -211,19 +212,31 @@ export default function DashboardPage() {
         )}
 
         {/* Admin — only visible to you */}
-        {profile?.email === 'alana.productions.co@gmail.com' && (
+        {isAdmin && (
           <div className="mb-4">
             <p className="text-xs text-violet-400 font-semibold uppercase tracking-widest mb-2">Admin</p>
-            <button
-              onClick={() => router.push('/admin/beta')}
-              className="w-full bg-zinc-900 border border-violet-800/50 hover:border-violet-600 transition rounded-xl p-4 text-left flex items-center justify-between"
-            >
-              <div>
-                <p className="font-semibold text-violet-300">Beta Applications</p>
-                <p className="text-zinc-500 text-sm">Review and approve beta testers</p>
-              </div>
-              <span className="text-violet-500 text-lg">→</span>
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => router.push('/admin/beta')}
+                className="bg-zinc-900 border border-violet-800/50 hover:border-violet-600 transition rounded-xl p-4 text-left flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-semibold text-violet-300">Beta Applications</p>
+                  <p className="text-zinc-500 text-sm">Review and approve beta testers</p>
+                </div>
+                <span className="text-violet-500 text-lg">→</span>
+              </button>
+              <button
+                onClick={() => router.push('/admin/beta/reports')}
+                className="bg-zinc-900 border border-violet-800/50 hover:border-violet-600 transition rounded-xl p-4 text-left flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-semibold text-violet-300">Beta Feedback</p>
+                  <p className="text-zinc-500 text-sm">Reports, recommendations & activity</p>
+                </div>
+                <span className="text-violet-500 text-lg">→</span>
+              </button>
+            </div>
           </div>
         )}
 
