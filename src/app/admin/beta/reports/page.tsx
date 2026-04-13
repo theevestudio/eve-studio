@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { useRouter } from 'next/navigation'
 
 type BetaReport = {
@@ -58,13 +59,14 @@ export default function BetaReportsPage() {
         return
       }
 
+      const admin = createAdminClient()
       const [{ data: reps, error: repErr }, { data: evs, error: evErr }] = await Promise.all([
-        supabase
+        admin
           .from('beta_reports')
           .select('*, profiles(email, full_name)')
           .order('created_at', { ascending: false })
           .limit(200),
-        supabase
+        admin
           .from('beta_events')
           .select('*, profiles(email)')
           .order('created_at', { ascending: false })
@@ -84,7 +86,7 @@ export default function BetaReportsPage() {
 
   async function updateStatus(id: string, status: 'reviewed' | 'resolved') {
     setUpdatingId(id)
-    await supabase.from('beta_reports').update({ status }).eq('id', id)
+    await createAdminClient().from('beta_reports').update({ status }).eq('id', id)
     setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r))
     setUpdatingId(null)
   }
