@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import type { Script, Theme } from '@/lib/types'
 import { useToast, Toast } from '@/components/Toast'
 import LoadingEVE from '@/components/LoadingEVE'
@@ -21,7 +21,6 @@ export default function ScriptsPage() {
   const [activeThemeFilter, setActiveThemeFilter] = useState<string | null>(null)
   const { toast, show: showToast } = useToast()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export default function ScriptsPage() {
       ;(h || []).forEach(r => { counts[r.script_id] = (counts[r.script_id] || 0) + 1 })
       setHeartCounts(counts)
 
-      const paramTheme = searchParams.get('theme')
+      const paramTheme = new URLSearchParams(window.location.search).get('theme')
       if (paramTheme) setActiveThemeFilter(paramTheme)
 
       setLoading(false)
