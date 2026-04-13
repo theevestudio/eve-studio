@@ -30,13 +30,21 @@ export default function ThemeDetailPage() {
 
   return (
     <Shell onBack={() => router.push('/dashboard/themes')} name={theme.client_name}>
-      {/* Generate button */}
-      <button
-        onClick={() => router.push(`/dashboard/vibe?theme=${theme.id}`)}
-        className="w-full bg-violet-600 hover:bg-violet-500 transition text-white font-bold py-4 rounded-xl text-lg mb-8"
-      >
-        Generate Scripts with VIBE →
-      </button>
+      {/* Action buttons */}
+      <div className="flex flex-col gap-3 mb-8">
+        <button
+          onClick={() => router.push(`/dashboard/vibe?theme=${theme.id}`)}
+          className="w-full bg-violet-600 hover:bg-violet-500 transition text-white font-bold py-4 rounded-xl text-lg"
+        >
+          Generate Scripts with VIBE →
+        </button>
+        <button
+          onClick={() => router.push(`/dashboard/scripts?theme=${theme.id}`)}
+          className="w-full bg-zinc-900 hover:bg-zinc-800 transition text-zinc-300 hover:text-white font-semibold py-3 rounded-xl text-sm border border-zinc-800 hover:border-zinc-700"
+        >
+          View Scripts for {theme.client_name} →
+        </button>
+      </div>
 
       <div className="space-y-6">
         <Row label="Industry" value={theme.industry} />

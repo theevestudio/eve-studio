@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { Script, Theme } from '@/lib/types'
 import { useToast, Toast } from '@/components/Toast'
 import LoadingEVE from '@/components/LoadingEVE'
@@ -18,8 +18,10 @@ export default function ScriptsPage() {
   const [saving, setSaving] = useState(false)
   const [enhancing, setEnhancing] = useState<string | null>(null)
   const [confirmRestoreId, setConfirmRestoreId] = useState<string | null>(null)
+  const [activeThemeFilter, setActiveThemeFilter] = useState<string | null>(null)
   const { toast, show: showToast } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
@@ -40,6 +42,10 @@ export default function ScriptsPage() {
       const counts: Record<string, number> = {}
       ;(h || []).forEach(r => { counts[r.script_id] = (counts[r.script_id] || 0) + 1 })
       setHeartCounts(counts)
+
+      const paramTheme = searchParams.get('theme')
+      if (paramTheme) setActiveThemeFilter(paramTheme)
+
       setLoading(false)
     }
     load()
@@ -112,13 +118,27 @@ export default function ScriptsPage() {
 
   if (loading) return <Shell><LoadingEVE /></Shell>
 
+  // Themes that have at least one script
+  const themesWithScripts = Object.values(themes).filter(th =>
+    scripts.some(s => s.theme_id === th.id)
+  )
+
+  const filtered = activeThemeFilter
+    ? scripts.filter(s => s.theme_id === activeThemeFilter)
+    : scripts
+
+  const activeThemeName = activeThemeFilter ? themes[activeThemeFilter]?.client_name : null
+
   return (
     <Shell>
       <Toast toast={toast} />
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Scripts</h1>
-          <p className="text-zinc-500 text-sm mt-1">{scripts.length} script{scripts.length !== 1 ? 's' : ''}</p>
+          <p className="text-zinc-500 text-sm mt-1">
+            {filtered.length} script{filtered.length !== 1 ? 's' : ''}
+            {activeThemeName && <span> · {activeThemeName}</span>}
+          </p>
         </div>
         <div className="flex gap-3">
           <button
@@ -135,6 +155,35 @@ export default function ScriptsPage() {
           </button>
         </div>
       </div>
+
+      {/* Client filter pills */}
+      {themesWithScripts.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button
+            onClick={() => { setActiveThemeFilter(null); router.replace('/dashboard/scripts') }}
+            className={`text-xs px-3 py-1.5 rounded-full border transition ${
+              !activeThemeFilter
+                ? 'bg-violet-600 border-violet-600 text-white'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white'
+            }`}
+          >
+            All
+          </button>
+          {themesWithScripts.map(th => (
+            <button
+              key={th.id}
+              onClick={() => { setActiveThemeFilter(th.id); router.replace(`/dashboard/scripts?theme=${th.id}`) }}
+              className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                activeThemeFilter === th.id
+                  ? 'bg-violet-600 border-violet-600 text-white'
+                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white'
+              }`}
+            >
+              {th.client_name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {scripts.length === 0 ? (
         <div className="border border-dashed border-zinc-800 rounded-xl p-12 text-center">
@@ -154,9 +203,19 @@ export default function ScriptsPage() {
             </button>
           </div>
         </div>
+      ) : filtered.length === 0 ? (
+        <div className="border border-dashed border-zinc-800 rounded-xl p-12 text-center">
+          <p className="text-zinc-500 mb-4">No scripts for {activeThemeName}.</p>
+          <button
+            onClick={() => router.push(`/dashboard/vibe?theme=${activeThemeFilter}`)}
+            className="bg-violet-600 hover:bg-violet-500 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
+          >
+            Generate with VIBE
+          </button>
+        </div>
       ) : (
         <div className="space-y-4">
-          {scripts.map(script => {
+          {filtered.map(script => {
             const isExpanded = expandedId === script.id
             const isEditing = editingId === script.id
             const isImported = script.source === 'imported'
