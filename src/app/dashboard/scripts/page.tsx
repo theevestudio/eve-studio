@@ -144,7 +144,7 @@ export default function ScriptsPage() {
   return (
     <Shell>
       <Toast toast={toast} />
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <div>
           <h1 className="text-2xl font-bold">Scripts</h1>
           <p className="text-zinc-500 text-sm mt-1">
@@ -152,16 +152,16 @@ export default function ScriptsPage() {
             {activeThemeName && <span> · {activeThemeName}</span>}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             onClick={() => router.push('/dashboard/scripts/import')}
-            className="border border-zinc-700 hover:border-violet-500 transition text-zinc-400 hover:text-white text-sm font-semibold px-4 py-2 rounded-lg"
+            className="flex-1 sm:flex-none border border-zinc-700 hover:border-violet-500 transition text-zinc-400 hover:text-white text-sm font-semibold px-4 py-2 rounded-lg"
           >
             Import script
           </button>
           <button
             onClick={() => router.push('/dashboard/vibe')}
-            className="bg-violet-600 hover:bg-violet-500 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
+            className="flex-1 sm:flex-none bg-violet-600 hover:bg-violet-500 transition text-white text-sm font-semibold px-4 py-2 rounded-lg"
           >
             + Generate with VIBE
           </button>
@@ -488,12 +488,12 @@ function Shell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   return (
     <div className="min-h-screen bg-black text-white">
-      <nav className="border-b border-zinc-800 px-6 py-4 flex items-center gap-4">
-        <button onClick={() => router.push('/dashboard')} className="text-zinc-500 hover:text-white transition text-sm">← Dashboard</button>
+      <nav className="border-b border-zinc-800 px-4 sm:px-6 py-4 flex items-center gap-4">
+        <button onClick={() => router.push('/dashboard')} className="text-zinc-500 hover:text-white transition text-sm shrink-0">← Dashboard</button>
         <span className="text-zinc-700">|</span>
         <span className="text-sm font-semibold">Scripts</span>
       </nav>
-      <main className="max-w-4xl mx-auto px-6 py-10">{children}</main>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">{children}</main>
     </div>
   )
 }

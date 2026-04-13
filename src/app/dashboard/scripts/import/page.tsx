@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import type { Theme } from '@/lib/types'
 import LoadingEVE from '@/components/LoadingEVE'
 
-type Tab = 'single' | 'bulk'
+type Tab = 'single' | 'bulk' | 'client'
 
 type BulkResult = { title: string; ok: boolean; error?: string }
 
@@ -17,12 +17,16 @@ export default function ImportScriptPage() {
   const router = useRouter()
   const supabase = createClient()
 
+  async function loadThemes() {
+    const { data: t } = await supabase.from('themes').select('*').order('client_name')
+    setThemes(t || [])
+  }
+
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
-      const { data: t } = await supabase.from('themes').select('*').order('client_name')
-      setThemes(t || [])
+      await loadThemes()
       setLoading(false)
     }
     load()
@@ -34,21 +38,24 @@ export default function ImportScriptPage() {
     <Shell>
       {/* Tabs */}
       <div className="flex gap-1 mb-8 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
-        {(['single', 'bulk'] as Tab[]).map(t => (
+        {([
+          { key: 'single', label: 'Single Script' },
+          { key: 'bulk',   label: 'Bulk Import' },
+          { key: 'client', label: 'Import Client' },
+        ] as { key: Tab; label: string }[]).map(t => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${tab === t ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${tab === t.key ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`}
           >
-            {t === 'single' ? 'Single Script' : 'Bulk Import'}
+            {t.label}
           </button>
         ))}
       </div>
 
-      {tab === 'single'
-        ? <SingleImport themes={themes} />
-        : <BulkImport themes={themes} />
-      }
+      {tab === 'single' && <SingleImport themes={themes} />}
+      {tab === 'bulk'   && <BulkImport themes={themes} />}
+      {tab === 'client' && <ClientImport onClientAdded={loadThemes} />}
     </Shell>
   )
 }
@@ -323,6 +330,191 @@ function BulkImport({ themes }: { themes: Theme[] }) {
 
         <p className="text-center text-zinc-600 text-xs">Importing is free · Enhance each script with VIBE (1 token) after</p>
       </div>
+    </div>
+  )
+}
+
+// ─── Client Import ────────────────────────────────────────────────────────────
+
+function ClientImport({ onClientAdded }: { onClientAdded: () => Promise<void> }) {
+  const supabase = createClient()
+  const [rawText, setRawText] = useState('')
+  const [clientName, setClientName] = useState('')
+  const [parsing, setParsing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [parsed, setParsed] = useState<Record<string, any> | null>(null)
+  const [success, setSuccess] = useState(false)
+
+  async function handleParse() {
+    if (!rawText.trim()) { setError('Paste some client info first'); return }
+    setParsing(true)
+    setError('')
+    try {
+      const res = await fetch('/api/themes/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: rawText }),
+      })
+      const data = await res.json()
+      if (data.error) { setError(data.error); return }
+      setParsed(data.fields)
+      if (data.fields?.client_name) setClientName(data.fields.client_name)
+    } catch {
+      setError('Failed to parse — try again.')
+    } finally {
+      setParsing(false)
+    }
+  }
+
+  async function handleSave() {
+    if (!clientName.trim()) { setError('Client name is required'); return }
+    setSaving(true)
+    setError('')
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setError('Not signed in'); setSaving(false); return }
+
+    const fields = parsed ?? {}
+    const payload = {
+      user_id: user.id,
+      client_name: clientName.trim(),
+      industry: fields.industry || null,
+      sub_niche: fields.sub_niche || null,
+      platforms: fields.platforms?.length ? fields.platforms : null,
+      videos_per_month: fields.videos_per_month || null,
+      audience_age: fields.audience_age ? [fields.audience_age] : null,
+      audience_gender: fields.audience_gender || null,
+      audience_lifestyle: Array.isArray(fields.audience_lifestyle) ? fields.audience_lifestyle : fields.audience_lifestyle ? fields.audience_lifestyle.split(',').map((s: string) => s.trim()) : null,
+      audience_wants: Array.isArray(fields.audience_wants) ? fields.audience_wants : fields.audience_wants ? fields.audience_wants.split(',').map((s: string) => s.trim()) : null,
+      audience_knowledge: fields.audience_knowledge || null,
+      content_personality: fields.content_personality?.length ? fields.content_personality : null,
+      on_camera: fields.on_camera || null,
+      speaking_style: fields.speaking_style || null,
+      hook_styles: fields.hook_styles?.length ? fields.hook_styles : null,
+      topics_never: Array.isArray(fields.topics_never) ? fields.topics_never : fields.topics_never ? fields.topics_never.split(',').map((s: string) => s.trim()) : null,
+      content_goals: fields.content_goals?.length ? fields.content_goals : null,
+      primary_cta: fields.primary_cta || null,
+      signature_offer: fields.signature_offer || null,
+      content_pillars: Array.isArray(fields.content_pillars) ? fields.content_pillars : fields.content_pillars ? fields.content_pillars.split(',').map((s: string) => s.trim()) : null,
+      filming_location: fields.filming_location ? [fields.filming_location] : null,
+      visual_vibe: fields.visual_vibe || null,
+      audio_style: fields.audio_style || null,
+      brand_differentiators: Array.isArray(fields.brand_differentiators) ? fields.brand_differentiators : fields.brand_differentiators ? fields.brand_differentiators.split(',').map((s: string) => s.trim()) : null,
+      real_comments: fields.real_comments || null,
+      common_misconception: fields.common_misconception || null,
+    }
+
+    const { error: err } = await supabase.from('themes').insert(payload)
+    if (err) { setError(err.message); setSaving(false); return }
+
+    await onClientAdded()
+    setSuccess(true)
+    setSaving(false)
+  }
+
+  if (success) {
+    return (
+      <div className="max-w-xl mx-auto text-center py-12">
+        <div className="w-16 h-16 rounded-full bg-emerald-900/30 border border-emerald-700 flex items-center justify-center mx-auto mb-6 text-3xl">✓</div>
+        <h2 className="text-2xl font-bold mb-3">Client added</h2>
+        <p className="text-zinc-500 text-sm mb-8"><span className="text-white">{clientName}</span> is now available as a client across E.V.E. Studio.</p>
+        <div className="flex gap-3 justify-center">
+          <button onClick={() => { setSuccess(false); setRawText(''); setParsed(null); setClientName('') }} className="bg-violet-600 hover:bg-violet-500 transition text-white font-semibold px-5 py-2.5 rounded-lg text-sm">Add another client</button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold mb-1">Import Client</h1>
+        <p className="text-zinc-500 text-sm">Paste anything about the client — intake form responses, emails, notes — and VIBE will extract what it can to build their theme.</p>
+      </div>
+
+      {!parsed ? (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">Client info</label>
+            <textarea
+              value={rawText}
+              onChange={e => { setRawText(e.target.value); setError('') }}
+              placeholder="Paste intake form answers, emails, notes, a bio — anything that describes this client and their content needs..."
+              rows={14}
+              className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition resize-none"
+            />
+          </div>
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          <button
+            onClick={handleParse}
+            disabled={parsing || !rawText.trim()}
+            className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 transition text-white font-bold py-4 rounded-xl text-base"
+          >
+            {parsing ? 'VIBE is reading this...' : 'Parse with VIBE'}
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="bg-violet-950/30 border border-violet-800/40 rounded-xl px-5 py-4">
+            <p className="text-violet-300 text-sm font-medium mb-1">VIBE extracted the following</p>
+            <p className="text-zinc-400 text-sm">Review the client name and confirm. You can edit all fields later in the Themes section.</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-1">Client name <span className="text-red-400">*</span></label>
+            <input
+              type="text"
+              value={clientName}
+              onChange={e => { setClientName(e.target.value); setError('') }}
+              className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition"
+              placeholder="Client name"
+            />
+          </div>
+
+          {/* Preview extracted fields */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">Extracted data</p>
+            {[
+              ['Industry', parsed.industry],
+              ['Sub-niche', parsed.sub_niche],
+              ['Platforms', Array.isArray(parsed.platforms) ? parsed.platforms.join(', ') : parsed.platforms],
+              ['Audience age', parsed.audience_age],
+              ['Audience gender', parsed.audience_gender],
+              ['Content goals', Array.isArray(parsed.content_goals) ? parsed.content_goals.join(', ') : parsed.content_goals],
+              ['Primary CTA', parsed.primary_cta],
+              ['Signature offer', parsed.signature_offer],
+              ['Speaking style', parsed.speaking_style],
+            ].filter(([, v]) => v).map(([label, value]) => (
+              <div key={label as string} className="flex gap-3 text-sm">
+                <span className="text-zinc-500 shrink-0 w-36">{label}</span>
+                <span className="text-zinc-200">{value as string}</span>
+              </div>
+            ))}
+            {Object.values(parsed).filter(Boolean).length === 0 && (
+              <p className="text-zinc-600 text-sm">No fields extracted — you can still save with just the client name and fill in details later.</p>
+            )}
+          </div>
+
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleSave}
+              disabled={saving || !clientName.trim()}
+              className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 transition text-white font-bold py-4 rounded-xl text-base"
+            >
+              {saving ? 'Saving...' : `Save ${clientName || 'Client'}`}
+            </button>
+            <button
+              onClick={() => { setParsed(null); setError('') }}
+              className="border border-zinc-700 hover:border-zinc-500 transition text-zinc-400 hover:text-white px-5 py-4 rounded-xl text-sm font-medium"
+            >
+              Re-paste
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

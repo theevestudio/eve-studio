@@ -57,7 +57,7 @@ export default function PluginPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <main className="max-w-3xl mx-auto px-6 py-12">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
         {/* Header */}
         <div className="mb-10">

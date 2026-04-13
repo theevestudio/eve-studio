@@ -210,16 +210,16 @@ export default function NewThemePage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <nav className="border-b border-zinc-800 px-6 py-4 flex items-center gap-4">
+      <nav className="border-b border-zinc-800 px-4 sm:px-6 py-4 flex items-center gap-4">
         <button onClick={() => router.push('/dashboard/themes')} className="text-zinc-500 hover:text-white transition text-sm">← Themes</button>
         <span className="text-zinc-700">|</span>
         <span className="text-sm font-semibold">New Client Theme</span>
       </nav>
 
-      <main className="max-w-2xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-8">
 
         {/* Mode selector */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-1 flex gap-1">
+        <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-1 flex flex-col sm:flex-row gap-1">
           {([
             { key: 'self', label: 'Fill it yourself' },
             { key: 'import', label: 'Import from existing' },

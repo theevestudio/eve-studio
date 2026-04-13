@@ -102,20 +102,20 @@ export default function BetaDashboard({
       </div>
 
       {/* Navbar */}
-      <nav className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={160} height={45} />
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-zinc-400">{profile.email}</span>
+      <nav className="border-b border-zinc-800 px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+        <Image src="/logo-full.png" alt="The E.V.E. Studio" width={140} height={40} className="shrink-0" />
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-sm text-zinc-400 truncate hidden sm:block">{profile.email}</span>
           <button
             onClick={onSignOut}
-            className="text-sm text-zinc-500 hover:text-white transition"
+            className="text-sm text-zinc-500 hover:text-white transition shrink-0"
           >
             Sign out
           </button>
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         {/* Welcome header */}
         <div className="mb-10">
@@ -128,7 +128,7 @@ export default function BetaDashboard({
         </div>
 
         {/* What we need from you */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           {[
             {
               number: '01',
@@ -163,7 +163,7 @@ export default function BetaDashboard({
           </p>
 
           {/* Type selector */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+          <div className="grid grid-cols-2 gap-2 mb-4">
             {REPORT_TYPES.map(rt => (
               <button
                 key={rt.value}

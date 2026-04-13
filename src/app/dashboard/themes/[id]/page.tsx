@@ -98,12 +98,12 @@ function Row({ label, value }: { label: string; value?: string | null }) {
 function Shell({ children, onBack, name }: { children: React.ReactNode; onBack: () => void; name: string }) {
   return (
     <div className="min-h-screen bg-black text-white">
-      <nav className="border-b border-zinc-800 px-6 py-4 flex items-center gap-4">
-        <button onClick={onBack} className="text-zinc-500 hover:text-white transition text-sm">← Themes</button>
+      <nav className="border-b border-zinc-800 px-4 sm:px-6 py-4 flex items-center gap-4">
+        <button onClick={onBack} className="text-zinc-500 hover:text-white transition text-sm shrink-0">← Themes</button>
         <span className="text-zinc-700">|</span>
-        <span className="text-sm font-semibold">{name}</span>
+        <span className="text-sm font-semibold truncate">{name}</span>
       </nav>
-      <main className="max-w-3xl mx-auto px-6 py-10">{children}</main>
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">{children}</main>
     </div>
   )
 }

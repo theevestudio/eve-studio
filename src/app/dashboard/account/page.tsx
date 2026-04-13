@@ -187,12 +187,12 @@ function Shell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   return (
     <div className="min-h-screen bg-black text-white">
-      <nav className="border-b border-zinc-800 px-6 py-4 flex items-center gap-4">
+      <nav className="border-b border-zinc-800 px-4 sm:px-6 py-4 flex items-center gap-4">
         <button onClick={() => router.push('/dashboard')} className="text-zinc-500 hover:text-white transition text-sm">← Dashboard</button>
         <span className="text-zinc-700">|</span>
         <span className="text-sm font-semibold">Account</span>
       </nav>
-      <main className="max-w-2xl mx-auto px-6 py-10">{children}</main>
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">{children}</main>
     </div>
   )
 }

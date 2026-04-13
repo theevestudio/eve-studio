@@ -108,7 +108,7 @@ export default function BetaReportsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
 
         {/* Header */}
         <div className="mb-8">
@@ -143,7 +143,7 @@ export default function BetaReportsPage() {
         {tab === 'reports' && (
           <>
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
               {[
                 { label: 'Open',     count: reportCounts.open,     color: 'text-yellow-400' },
                 { label: 'Reviewed', count: reportCounts.reviewed, color: 'text-violet-400' },
