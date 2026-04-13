@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { useRouter } from 'next/navigation'
+import LoadingEVE from '@/components/LoadingEVE'
 
 type BetaReport = {
   id: string
@@ -48,45 +47,32 @@ export default function BetaReportsPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'reviewed' | 'resolved'>('open')
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user || user.email !== 'alana.productions.co@gmail.com') {
-        setError('Unauthorized')
-        setLoading(false)
-        return
-      }
-
-      const admin = createAdminClient()
-      const [{ data: reps, error: repErr }, { data: evs, error: evErr }] = await Promise.all([
-        admin
-          .from('beta_reports')
-          .select('*, profiles(email, full_name)')
-          .order('created_at', { ascending: false })
-          .limit(200),
-        admin
-          .from('beta_events')
-          .select('*, profiles(email)')
-          .order('created_at', { ascending: false })
-          .limit(500),
-      ])
-
-      if (repErr || evErr) {
+      try {
+        const res = await fetch('/api/admin/reports')
+        if (res.status === 403) { setError('Unauthorized'); return }
+        if (!res.ok) { setError('Failed to load data'); return }
+        const data = await res.json()
+        setReports(data.reports ?? [])
+        setEvents(data.events ?? [])
+      } catch {
         setError('Failed to load data')
-      } else {
-        setReports((reps as BetaReport[]) ?? [])
-        setEvents((evs as BetaEvent[]) ?? [])
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     load()
   }, [])
 
   async function updateStatus(id: string, status: 'reviewed' | 'resolved') {
     setUpdatingId(id)
-    await createAdminClient().from('beta_reports').update({ status }).eq('id', id)
+    await fetch('/api/admin/reports', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    })
     setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r))
     setUpdatingId(null)
   }
@@ -101,7 +87,6 @@ export default function BetaReportsPage() {
     resolved: reports.filter(r => r.status === 'resolved').length,
   }
 
-  // Aggregate event counts for summary
   const eventCounts = events.reduce<Record<string, number>>((acc, e) => {
     acc[e.event] = (acc[e.event] ?? 0) + 1
     return acc
@@ -110,8 +95,8 @@ export default function BetaReportsPage() {
   const uniqueUsers = new Set(events.map(e => e.user_id)).size
 
   if (loading) return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <p className="text-zinc-500">Loading...</p>
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <LoadingEVE />
     </div>
   )
 
@@ -129,10 +114,10 @@ export default function BetaReportsPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-5">
             <button
-              onClick={() => router.push('/admin/beta')}
+              onClick={() => router.push('/dashboard')}
               className="text-zinc-500 hover:text-white text-sm transition flex items-center gap-1.5"
             >
-              ← Beta Applications
+              ← Dashboard
             </button>
           </div>
           <h1 className="text-2xl font-bold mb-1">Beta Reports & Activity</h1>
