@@ -222,7 +222,7 @@ export default function NewThemePage() {
         <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-1 flex gap-1">
           {([
             { key: 'self', label: 'Fill it yourself' },
-            { key: 'import', label: 'Import from form' },
+            { key: 'import', label: 'Import from existing' },
             { key: 'send', label: 'Send to client' },
           ] as const).map(m => (
             <button
@@ -279,7 +279,7 @@ export default function NewThemePage() {
         {mode === 'import' && !importDone && (
           <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6 space-y-4">
             <div>
-              <h3 className="font-semibold mb-1">Import from existing form</h3>
+              <h3 className="font-semibold mb-1">Import from existing</h3>
               <p className="text-zinc-500 text-sm">Paste in your client's completed onboarding form, intake answers, email responses — anything. VIBE will read it and fill in what it can. Fields it can't answer will be flagged red for you to fill in.</p>
             </div>
             <textarea
