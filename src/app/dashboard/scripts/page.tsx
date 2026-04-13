@@ -256,11 +256,6 @@ export default function ScriptsPage() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-semibold text-sm truncate">{script.title || 'Untitled script'}</p>
-                        {script.filmed && (
-                          <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-800/50 px-2 py-0.5 rounded-full shrink-0">
-                            🎬 Filmed
-                          </span>
-                        )}
                         {isImported && (
                           <span className="text-xs bg-amber-900/40 text-amber-400 border border-amber-800/50 px-2 py-0.5 rounded-full shrink-0">
                             Imported
@@ -284,6 +279,15 @@ export default function ScriptsPage() {
                     )}
                     {heartCounts[script.id] > 0 && (
                       <span className="text-xs text-violet-400 font-semibold">♥ {heartCounts[script.id]}</span>
+                    )}
+                    {script.filmed && (
+                      <span
+                        title="Filmed"
+                        className="text-base leading-none"
+                        style={{ filter: 'drop-shadow(0 0 6px #34d399)' }}
+                      >
+                        🎬
+                      </span>
                     )}
                     <span className="text-zinc-600 text-sm">{isExpanded ? '▲' : '▼'}</span>
                   </div>
@@ -386,9 +390,10 @@ export default function ScriptsPage() {
                               onClick={() => handleToggleFilmed(script)}
                               className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition border ${
                                 script.filmed
-                                  ? 'bg-emerald-900/40 border-emerald-700 text-emerald-400 hover:bg-emerald-900/60'
-                                  : 'border-zinc-700 text-zinc-400 hover:border-emerald-700 hover:text-emerald-400'
+                                  ? 'bg-emerald-600 border-emerald-500 text-white'
+                                  : 'border-zinc-700 text-zinc-400 hover:border-emerald-600 hover:text-emerald-400'
                               }`}
+                              style={script.filmed ? { boxShadow: '0 0 14px rgba(52,211,153,0.45)' } : undefined}
                             >
                               {script.filmed ? '🎬 Filmed' : 'Mark as filmed'}
                             </button>
