@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Image from 'next/image'
 import AnimatedDashboard from '@/components/AnimatedDashboard'
+import EVEOrbit from '@/components/EVEOrbit'
 
 export default function LandingPage() {
   const router = useRouter()
@@ -172,32 +173,56 @@ export default function LandingPage() {
         <AnimatedDashboard />
       </section>
 
-      {/* Features */}
-      <section id="features" className="max-w-5xl mx-auto px-6 mb-24">
-        <h2 className="text-3xl font-bold text-center mb-4">Everything your production needs</h2>
-        <p className="text-zinc-500 text-center mb-14 max-w-xl mx-auto">Built for editors who manage multiple clients and need to move fast without sacrificing quality.</p>
+      {/* EVE Plugin Orbit Animation */}
+      <section className="max-w-4xl mx-auto px-6 mb-8">
+        <div className="text-center mb-2">
+          <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">The Premiere Pro Plugin</p>
+          <h2 className="text-3xl font-bold mb-3">E.V.E. takes control of your edit.</h2>
+          <p className="text-zinc-500 max-w-lg mx-auto text-base">The AI that lives inside Adobe Premiere Pro. Give her your footage and your script — she does the rest.</p>
+        </div>
+        <EVEOrbit />
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FeatureCard icon="⚡" title="VIBE Script Engine" description="Generate scroll-stopping video scripts trained on your client's brand, audience, and goals. 1 token = 1 script. Never generic." />
-          <FeatureCard icon="🎯" title="Client Themes" description="Build a deep brand profile for each client. VIBE uses it to write scripts that actually sound like them — not like every other account." />
-          <FeatureCard icon="✏️" title="Edit & Restore" description="Edit any generated script directly in the platform. Changed your mind? Restore the original with one click — no lost work." />
-          <FeatureCard icon="🎬" title="Premiere Pro Plugin" description="E.V.E. lives inside Adobe Premiere Pro. Access your scripts, client notes, and files without ever leaving your timeline." />
-          <FeatureCard icon="📁" title="Client Management" description="Every client's brand, scripts, and notes — organized in one place. Built for editors juggling multiple accounts at once." />
-          <FeatureCard icon="🔗" title="Share with clients" description="Send one link — your client sees every script you made for them, hearts the ones they love, and you know exactly which to film first." />
+      {/* Plugin Features */}
+      <section id="features" className="max-w-5xl mx-auto px-6 mb-24">
+        <div className="text-center mb-12">
+          <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">Inside the Plugin</p>
+          <h2 className="text-3xl font-bold mb-3">Built for how you actually edit.</h2>
+          <p className="text-zinc-500 max-w-xl mx-auto">Everything happens in Premiere Pro. No switching apps, no copy-pasting, no wasted time.</p>
         </div>
 
-        {/* Share callout */}
-        <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-2xl px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div>
-            <p className="font-bold text-lg mb-1">Share all your client&apos;s scripts with one link.</p>
-            <p className="text-zinc-500 text-sm">They open it, read through, and heart the ones they love. You see the picks instantly — no back-and-forth, no confusion.</p>
-          </div>
-          <button
-            onClick={() => router.push('/auth/signup')}
-            className="shrink-0 border border-violet-600 hover:bg-violet-600 transition text-violet-300 hover:text-white font-semibold px-5 py-2.5 rounded-xl text-sm"
-          >
-            Try it free →
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <PluginCard
+            number="01"
+            title="Deep Scan"
+            accent="#7c3aed"
+            description="E.V.E. reads every clip in your Premiere project bin — categorizes it, tags it, and applies color labels automatically. Your bin organizes itself."
+          />
+          <PluginCard
+            number="02"
+            title="Auto-Edit"
+            accent="#0d9488"
+            description="Give E.V.E. your script and she matches footage to every beat, then cuts it into your timeline. One click from script to rough cut."
+          />
+          <PluginCard
+            number="03"
+            title="Scripts in Panel"
+            accent="#d97706"
+            description="Every client script — hook, body, b-roll notes — lives inside Premiere as you edit. No browser tabs, no screen switching, no lost focus."
+          />
+        </div>
+
+        {/* Micro-feature pills */}
+        <div className="flex flex-wrap gap-2 justify-center">
+          {[
+            'Audio cleanup', 'Sequence management', 'Filmed tracker',
+            'B-roll suggestions', 'Footage manifest', 'Color labels',
+            'Client file management', 'In-timeline notes',
+          ].map(f => (
+            <span key={f} className="px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 text-xs font-medium">
+              {f}
+            </span>
+          ))}
         </div>
       </section>
 
@@ -244,6 +269,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* What's New */}
+      <ChangelogSection />
 
       {/* Beta */}
       <BetaSection />
@@ -463,12 +491,112 @@ function BetaSection() {
   )
 }
 
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+function PluginCard({ number, title, description, accent }: { number: string; title: string; description: string; accent: string }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-      <p className="text-2xl mb-3">{icon}</p>
-      <p className="font-bold mb-2">{title}</p>
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: accent }} />
+      <p className="text-zinc-600 text-xs font-mono font-bold mb-4">{number}</p>
+      <p className="font-bold text-lg mb-2">{title}</p>
       <p className="text-zinc-500 text-sm leading-relaxed">{description}</p>
+      <span className="inline-block mt-4 text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-600 font-medium">
+        Premiere Pro Plugin
+      </span>
+    </div>
+  )
+}
+
+function ChangelogSection() {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <section className="max-w-3xl mx-auto px-6 mb-24">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-1">Product Updates</p>
+          <h2 className="text-2xl font-bold">What&apos;s New in E.V.E.</h2>
+        </div>
+        <span className="inline-flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide w-fit">
+          ✦ See What&apos;s New
+        </span>
+      </div>
+
+      <div className="space-y-4">
+        <ChangelogEntry
+          date="April 2026"
+          badge="Latest"
+          items={[
+            { type: 'NEW',      text: 'Bulk script import — paste multiple scripts separated by --- and import them all at once with live progress' },
+            { type: 'NEW',      text: 'Import Client tab — paste any notes, emails, or form responses and VIBE extracts the client theme automatically' },
+            { type: 'NEW',      text: 'E.V.E. robot head favicon — shows in all browser tabs, bookmarks, and iPhone home screen' },
+            { type: 'IMPROVED', text: 'NDA approval email now sends from noreply@theevestudio.io with links that open correctly in all browsers' },
+            { type: 'FIXED',    text: 'NDA signing link showing "expired" even when token was brand new' },
+            { type: 'FIXED',    text: 'Resend NDA button silently doing nothing when the API call failed' },
+          ]}
+        />
+
+        {expanded && (
+          <>
+            <ChangelogEntry
+              date="March 2026"
+              items={[
+                { type: 'NEW',      text: 'Beta application system — apply for founding member access directly from the site' },
+                { type: 'NEW',      text: 'NDA signing flow — applicants sign an NDA before gaining access, with PDF certificate + Google Drive upload' },
+                { type: 'NEW',      text: 'Admin dashboard for reviewing and approving beta applications' },
+                { type: 'NEW',      text: 'Script import with PDF upload — extract text from any PDF and import as a script' },
+                { type: 'IMPROVED', text: 'VIBE analysis notes and virality scoring shown after every script generation' },
+              ]}
+            />
+            <ChangelogEntry
+              date="February 2026"
+              items={[
+                { type: 'NEW', text: 'E.V.E. Studio beta launch — script generation with VIBE' },
+                { type: 'NEW', text: 'Client themes system — build deep brand profiles that VIBE uses for every script' },
+                { type: 'NEW', text: 'Script editing, restore, and client sharing via link' },
+                { type: 'NEW', text: 'Premiere Pro plugin with Deep Scan, Auto-Edit, and in-timeline script panel' },
+              ]}
+            />
+          </>
+        )}
+
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="w-full py-3 text-zinc-600 hover:text-zinc-400 transition text-sm font-medium"
+        >
+          {expanded ? '↑ Collapse' : '↓ View full changelog'}
+        </button>
+      </div>
+    </section>
+  )
+}
+
+function ChangelogEntry({
+  date, badge, items,
+}: {
+  date: string
+  badge?: string
+  items: { type: 'NEW' | 'IMPROVED' | 'FIXED'; text: string }[]
+}) {
+  const pill: Record<string, string> = {
+    NEW:      'bg-violet-900/40 text-violet-300',
+    IMPROVED: 'bg-blue-900/40 text-blue-300',
+    FIXED:    'bg-emerald-900/40 text-emerald-300',
+  }
+  return (
+    <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
+      <div className="flex items-center gap-3 mb-5">
+        <span className="text-white font-semibold">{date}</span>
+        {badge && <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full font-bold">{badge}</span>}
+      </div>
+      <div className="space-y-2.5">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-start gap-3 text-sm">
+            <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wide shrink-0 mt-0.5 ${pill[item.type]}`}>
+              {item.type}
+            </span>
+            <span className="text-zinc-400 leading-relaxed">{item.text}</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
