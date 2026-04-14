@@ -73,7 +73,21 @@ export default function PluginPage() {
             <h1 className="text-3xl font-bold">E.V.E. Plugin</h1>
             <span className="text-xs bg-violet-900/50 text-violet-300 border border-violet-700 px-2.5 py-1 rounded-full font-semibold uppercase tracking-widest">Beta</span>
           </div>
-          <p className="text-zinc-400">Your Premiere Pro plugin for script access, sequence creation, and footage import — directly inside your timeline.</p>
+          <p className="text-zinc-400">Your Premiere Pro plugin for autonomous editing — Deep Scan your footage, pick a script, walk away.</p>
+        </div>
+
+        {/* What's new in v1.1 */}
+        <div className="bg-violet-950/20 border border-violet-700/40 rounded-xl p-5 mb-6 flex items-start gap-3">
+          <span className="text-violet-400 text-lg shrink-0 mt-0.5">✦</span>
+          <div>
+            <p className="text-xs text-violet-400 font-bold uppercase tracking-widest mb-1">New in v1.1 — Download required</p>
+            <p className="text-white font-semibold text-sm mb-1">Deep Scan + Autonomous Editing</p>
+            <ul className="text-zinc-400 text-sm space-y-0.5">
+              <li>· Deep Scan classifies and color-labels all footage in your project automatically</li>
+              <li>· Run E.V.E. Edit — EVE cuts a full rough edit from your script while you walk away</li>
+              <li>· Version check — plugin notifies you inside Premiere when updates are available</li>
+            </ul>
+          </div>
         </div>
 
         {/* Beta session status */}
@@ -97,14 +111,17 @@ export default function PluginPage() {
 
         {/* Download */}
         <section className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-bold mb-1">Download the Plugin</h2>
-          <p className="text-zinc-400 text-sm mb-4">Download the ZIP, unzip it, then follow the install steps below.</p>
+          <div className="flex items-center gap-3 mb-1">
+            <h2 className="text-lg font-bold">Download the Plugin</h2>
+            <span className="text-xs bg-violet-900/50 text-violet-300 border border-violet-700/50 px-2 py-0.5 rounded-full font-semibold">v1.1.0-beta.1</span>
+          </div>
+          <p className="text-zinc-400 text-sm mb-4">Download the ZIP, unzip it, then follow the install steps below. If you already have an older version, re-download and reload in UXP Dev Tools.</p>
           <a
             href="/eve-plugin.zip"
             download="eve-plugin.zip"
             className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 transition text-white font-bold px-5 py-2.5 rounded-xl text-sm"
           >
-            ↓ Download E.V.E. Plugin
+            ↓ Download E.V.E. Plugin v1.1
           </a>
         </section>
 
@@ -135,8 +152,8 @@ export default function PluginPage() {
           <ul className="space-y-2 text-sm text-zinc-300">
             <li>· This is early beta software. Bugs and unexpected behavior may occur.</li>
             <li>· Do not use E.V.E. on active client projects without a backup — always keep a copy of your Premiere project.</li>
-            <li>· Sequence creation and footage import are experimental. Review all changes before rendering.</li>
-            <li>· Updates will be released regularly. Check your account page for new versions and re-download when available.</li>
+            <li>· Deep Scan and autonomous editing are experimental. Always review the rough cut before delivering to clients.</li>
+            <li>· When a new version is available, the plugin will show a banner inside Premiere — download the new ZIP from this page and reload it in UXP Dev Tools.</li>
             <li>· If the plugin stops working after a Premiere update, re-download from this page — we push fixes fast.</li>
           </ul>
         </section>

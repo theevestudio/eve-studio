@@ -2,7 +2,7 @@ export const runtime = 'edge'
 
 // Bump BETA_VERSION each time you fix a bug and repackage the beta plugin.
 // Bump PRODUCTION_VERSION only when promoting a stable build to paying subscribers.
-const BETA_VERSION       = '1.0.0-beta.1'
+const BETA_VERSION       = '1.1.0-beta.1'   // Deep Scan + autonomous editing pipeline
 const PRODUCTION_VERSION = '1.0.0'
 
 export async function GET(req: Request) {
