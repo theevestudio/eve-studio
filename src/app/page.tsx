@@ -515,10 +515,8 @@ function ChangelogSection() {
           badge="Latest"
           items={[
             { type: 'NEW',      text: 'Bulk script import — paste multiple scripts separated by --- and import them all at once with live progress' },
-            { type: 'NEW',      text: 'Import Client tab — paste any notes, emails, or form responses and VIBE extracts the client theme automatically' },
-            { type: 'IMPROVED', text: 'NDA approval email now sends from noreply@theevestudio.io with links that open correctly in all browsers' },
-            { type: 'FIXED',    text: 'NDA signing link showing "expired" even when token was brand new' },
-            { type: 'FIXED',    text: 'Resend NDA button silently doing nothing when the API call failed' },
+            { type: 'NEW',      text: 'Import Client tab — paste any client notes, emails, or form responses and VIBE extracts their theme automatically' },
+            { type: 'IMPROVED', text: 'Plugin features section — Deep Scan, Auto-Edit, and Scripts in Panel now highlighted with full descriptions' },
           ]}
         />
 
@@ -527,9 +525,6 @@ function ChangelogSection() {
             <ChangelogEntry
               date="March 2026"
               items={[
-                { type: 'NEW',      text: 'Beta application system — apply for founding member access directly from the site' },
-                { type: 'NEW',      text: 'NDA signing flow — applicants sign an NDA before gaining access, with PDF certificate + Google Drive upload' },
-                { type: 'NEW',      text: 'Admin dashboard for reviewing and approving beta applications' },
                 { type: 'NEW',      text: 'Script import with PDF upload — extract text from any PDF and import as a script' },
                 { type: 'IMPROVED', text: 'VIBE analysis notes and virality scoring shown after every script generation' },
               ]}
