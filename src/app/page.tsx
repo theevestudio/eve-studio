@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Image from 'next/image'
 import AnimatedDashboard from '@/components/AnimatedDashboard'
-import EVEOrbit from '@/components/EVEOrbit'
 
 export default function LandingPage() {
   const router = useRouter()
@@ -171,16 +170,6 @@ export default function LandingPage() {
       <section className="max-w-3xl mx-auto px-6 mb-24">
         <p className="text-center text-zinc-400 text-base uppercase tracking-widest font-semibold mb-5">Watch VIBE work in real time</p>
         <AnimatedDashboard />
-      </section>
-
-      {/* EVE Plugin Orbit Animation */}
-      <section className="max-w-4xl mx-auto px-6 mb-8">
-        <div className="text-center mb-2">
-          <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">The Premiere Pro Plugin</p>
-          <h2 className="text-3xl font-bold mb-3">E.V.E. takes control of your edit.</h2>
-          <p className="text-zinc-500 max-w-lg mx-auto text-base">The AI that lives inside Adobe Premiere Pro. Give her your footage and your script — she does the rest.</p>
-        </div>
-        <EVEOrbit />
       </section>
 
       {/* Plugin Features */}
