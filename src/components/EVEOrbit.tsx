@@ -3,51 +3,77 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
-// ── Internal coordinate space ─────────────────────────────────────────────────
-const B  = 500   // internal canvas size (px)
-const CX = 250   // orbit center x
-const CY = 258   // orbit center y
-const RX = 182   // orbit x-radius
-const RY = 66    // orbit y-radius (flatter = more depth illusion)
-const CW = 90    // clip width
-const CH = 26    // clip height
+const B   = 560   // internal canvas
+const CX  = 280   // center
+const CY  = 292
+const ROB = 210   // robot display size
 
-const CLIPS = [
-  { label: 'HOOK_01.mp4',    color: '#7c3aed' },
-  { label: 'BROLL_03.mov',   color: '#0d9488' },
-  { label: 'CTA.mp4',        color: '#d97706' },
-  { label: 'SHEN_B.mp4',     color: '#7c3aed' },
-  { label: 'OPENING.mov',    color: '#0891b2' },
-  { label: 'FINAL_CUT.mp4',  color: '#dc2626' },
+// ── Three orbital tracks (V3 outer → V1 inner) ───────────────────────────────
+const TRACKS = [
+  {
+    rx: 210, ry: 78, period: 28000, h: 27,
+    color: '#c026d3',
+    clips: [
+      { label: 'BROLL_01',  w: 94  },
+      { label: 'CUTAWAY',   w: 118 },
+      { label: 'BROLL_02',  w: 80  },
+      { label: 'OVERLAY',   w: 92  },
+    ],
+    startAngles: [0.15, 2.0, 3.7, 5.2],
+  },
+  {
+    rx: 168, ry: 62, period: 22000, h: 27,
+    color: '#0284c7',
+    clips: [
+      { label: 'HOOK',         w: 106 },
+      { label: 'TALKING_HEAD', w: 130 },
+      { label: 'CTA',          w: 84  },
+      { label: 'CUTAWAY_2',    w: 72  },
+    ],
+    startAngles: [0.55, 2.25, 3.9, 5.4],
+  },
+  {
+    rx: 128, ry: 47, period: 18000, h: 27,
+    color: '#d97706',
+    clips: [
+      { label: 'MAIN_01',    w: 116 },
+      { label: 'MAIN_02',    w: 90  },
+      { label: 'TITLE_CARD', w: 84  },
+      { label: 'MAIN_03',    w: 108 },
+    ],
+    startAngles: [0.3, 2.1, 3.65, 5.15],
+  },
 ]
 
-const START_ANGLES = CLIPS.map((_, i) => (i / CLIPS.length) * 2 * Math.PI)
-const PERIODS      = [21000, 27000, 19500, 25000, 18000, 23000] // ms / revolution
-
 type Action = 'normal' | 'glow' | 'cut' | 'fade'
-type Pos    = { x: number; y: number; depth: number }
+type ClipPos = { x: number; y: number; depth: number }
 
 export default function EVEOrbit() {
-  const containerRef   = useRef<HTMLDivElement>(null)
-  const anglesRef      = useRef(START_ANGLES.slice())
-  const lastTimeRef    = useRef<number | null>(null)
-  const rafRef         = useRef<number | null>(null)
-  const actionTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const anglesRef    = useRef(TRACKS.map(t => t.startAngles.slice()))
+  const lastTimeRef  = useRef<number | null>(null)
+  const rafRef       = useRef<number | null>(null)
+  const actionTimer  = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const [scale, setScale]             = useState<number>(0.6)
-  const [activated, setActivated]     = useState(false)
-  const [bursting, setBursting]       = useState(false)
+  const [scale, setScale]               = useState<number>(0.6)
+  const [activated, setActivated]       = useState(false)
+  const [bursting, setBursting]         = useState(false)
   const [orbitVisible, setOrbitVisible] = useState(false)
-  const [clipActions, setClipActions] = useState<Action[]>(CLIPS.map(() => 'normal'))
-  const [positions, setPositions]     = useState<Pos[]>(() =>
-    START_ANGLES.map(a => ({
-      x: CX + RX * Math.cos(a),
-      y: CY + RY * Math.sin(a),
-      depth: 0.5,
-    }))
+
+  const [actions, setActions] = useState<Action[][]>(
+    TRACKS.map(t => t.clips.map(() => 'normal'))
+  )
+  const [positions, setPositions] = useState<ClipPos[][]>(
+    TRACKS.map(t =>
+      t.startAngles.map(a => ({
+        x: CX + t.rx * Math.cos(a),
+        y: CY + t.ry * Math.sin(a),
+        depth: (CY + t.ry * Math.sin(a) - (CY - t.ry)) / (2 * t.ry),
+      }))
+    )
   )
 
-  // ── Responsive scale via ResizeObserver ────────────────────────────────────
+  // Responsive scale
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -59,7 +85,7 @@ export default function EVEOrbit() {
     return () => ro.disconnect()
   }, [])
 
-  // ── RAF orbit loop ─────────────────────────────────────────────────────────
+  // RAF orbit loop
   useEffect(() => {
     if (!activated) return
     lastTimeRef.current = null
@@ -69,16 +95,22 @@ export default function EVEOrbit() {
       const dt = Math.min(t - lastTimeRef.current, 50)
       lastTimeRef.current = t
 
-      anglesRef.current = anglesRef.current.map((a, i) =>
-        a + (2 * Math.PI / PERIODS[i]) * dt
+      const next = anglesRef.current.map((tAngles, ti) =>
+        tAngles.map(a => a + (2 * Math.PI / TRACKS[ti].period) * dt)
       )
+      anglesRef.current = next
 
-      setPositions(anglesRef.current.map(a => {
-        const x     = CX + RX * Math.cos(a)
-        const y     = CY + RY * Math.sin(a)
-        const depth = (y - (CY - RY)) / (2 * RY) // 0 = top / far, 1 = bottom / close
-        return { x, y, depth }
-      }))
+      setPositions(next.map((tAngles, ti) =>
+        tAngles.map(a => {
+          const { rx, ry } = TRACKS[ti]
+          const y = CY + ry * Math.sin(a)
+          return {
+            x: CX + rx * Math.cos(a),
+            y,
+            depth: (y - (CY - ry)) / (2 * ry),
+          }
+        })
+      ))
 
       rafRef.current = requestAnimationFrame(tick)
     }
@@ -87,74 +119,92 @@ export default function EVEOrbit() {
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [activated])
 
-  // ── Micro-actions ─────────────────────────────────────────────────────────
+  // Micro-actions
   useEffect(() => {
     if (!activated) return
 
     function next() {
-      const idx     = Math.floor(Math.random() * CLIPS.length)
-      const pool: Action[] = ['glow', 'cut', 'fade', 'glow', 'glow']
-      const action  = pool[Math.floor(Math.random() * pool.length)]
+      const ti     = Math.floor(Math.random() * TRACKS.length)
+      const ci     = Math.floor(Math.random() * TRACKS[ti].clips.length)
+      const pool: Action[] = ['cut', 'cut', 'glow', 'glow', 'fade', 'cut']
+      const action = pool[Math.floor(Math.random() * pool.length)]
+      const dur    = action === 'cut' ? 950 : action === 'fade' ? 1050 : 820
 
-      setClipActions(prev => { const n = [...prev]; n[idx] = action; return n })
+      setActions(prev => { const n = prev.map(r => [...r]); n[ti][ci] = action; return n })
       setTimeout(() => {
-        setClipActions(prev => { const n = [...prev]; n[idx] = 'normal'; return n })
-      }, action === 'cut' ? 650 : action === 'fade' ? 950 : 750)
+        setActions(prev => { const n = prev.map(r => [...r]); n[ti][ci] = 'normal'; return n })
+      }, dur)
 
-      actionTimer.current = setTimeout(next, 1300 + Math.random() * 1900)
+      actionTimer.current = setTimeout(next, 1100 + Math.random() * 1700)
     }
 
-    actionTimer.current = setTimeout(next, 2200)
+    actionTimer.current = setTimeout(next, 2400)
     return () => { if (actionTimer.current) clearTimeout(actionTimer.current) }
   }, [activated])
 
-  // ── Activation ────────────────────────────────────────────────────────────
   function handleClick() {
     if (activated || bursting) return
     setBursting(true)
     setTimeout(() => {
       setActivated(true)
       setBursting(false)
-      setTimeout(() => setOrbitVisible(true), 180)
+      setTimeout(() => setOrbitVisible(true), 200)
     }, 520)
   }
 
-  const ds = (depth: number) => 0.78 + 0.38 * depth  // depth → scale multiplier
-  const back  = positions.map((p, i) => ({ p, i })).filter(({ p }) => p.y <  CY)
-  const front = positions.map((p, i) => ({ p, i })).filter(({ p }) => p.y >= CY)
+  // Collect + depth-sort all clips
+  const allClips = TRACKS.flatMap((_, ti) =>
+    positions[ti].map((pos, ci) => ({ ti, ci, pos, action: actions[ti][ci] }))
+  ).sort((a, b) => a.pos.y - b.pos.y)
+
+  const backClips  = allClips.filter(c => c.pos.y <  CY)
+  const frontClips = allClips.filter(c => c.pos.y >= CY)
 
   return (
     <>
       <style>{`
         @keyframes eve-orbit-idle {
-          0%,100% { filter: drop-shadow(0 0 18px rgba(139,92,246,.65)) drop-shadow(0 0 40px rgba(124,58,237,.35)); }
-          50%      { filter: drop-shadow(0 0 38px rgba(167,139,250,.95)) drop-shadow(0 0 76px rgba(139,92,246,.55)); }
+          0%,100% { filter:drop-shadow(0 0 18px rgba(139,92,246,.65)) drop-shadow(0 0 40px rgba(124,58,237,.35)); }
+          50%     { filter:drop-shadow(0 0 38px rgba(167,139,250,.95)) drop-shadow(0 0 76px rgba(139,92,246,.55)); }
         }
         @keyframes eve-orbit-burst {
           0%   { transform:scale(1);    filter:drop-shadow(0 0 20px rgba(139,92,246,.7)); }
-          38%  { transform:scale(1.22); filter:drop-shadow(0 0 100px rgba(167,139,250,1)) drop-shadow(0 0 150px rgba(139,92,246,.9)); }
+          38%  { transform:scale(1.22); filter:drop-shadow(0 0 100px rgba(167,139,250,1)) drop-shadow(0 0 160px rgba(139,92,246,.9)); }
           68%  { transform:scale(0.96); filter:drop-shadow(0 0 32px rgba(139,92,246,.6)); }
           100% { transform:scale(1);    filter:drop-shadow(0 0 22px rgba(139,92,246,.7)); }
         }
-        @keyframes hint-blink { 0%,100%{opacity:.4} 50%{opacity:.95} }
-        @keyframes clip-glow-a { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.65) saturate(1.4)} }
-        @keyframes clip-cut-a  { 0%{transform:scaleX(1)} 22%{transform:scaleX(0.06)} 48%{transform:scaleX(1)} 100%{transform:scaleX(1)} }
-        @keyframes clip-fade-a { 0%,100%{opacity:1} 50%{opacity:.08} }
-        .eve-orbit-idle   { animation: eve-orbit-idle  2.5s ease-in-out infinite; will-change: filter; }
-        .eve-orbit-burst  { animation: eve-orbit-burst 0.52s ease-out forwards; }
-        .clip-glow { animation: clip-glow-a 0.75s ease-in-out; }
-        .clip-cut  { animation: clip-cut-a  0.65s ease-in-out; }
-        .clip-fade { animation: clip-fade-a 0.95s ease-in-out; }
-        .hint-blink{ animation: hint-blink  1.8s  ease-in-out infinite; }
+        @keyframes hint-blink { 0%,100%{opacity:.38} 50%{opacity:.9} }
+        @keyframes clip-glow-kf { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.75) saturate(1.4)} }
+        @keyframes clip-fade-kf { 0%,100%{opacity:1} 48%{opacity:.05} }
+        @keyframes cut-body-kf  {
+          0%,100%{filter:none}
+          18%{filter:brightness(1.6) saturate(1.3)}
+          50%{filter:brightness(1)}
+        }
+        @keyframes cut-blade-kf {
+          0%   {opacity:0; transform:scaleY(0.15);}
+          18%  {opacity:1; transform:scaleY(1.18); box-shadow:0 0 14px 5px rgba(139,92,246,1),0 0 32px 10px rgba(139,92,246,.5);}
+          65%  {opacity:1; transform:scaleY(1);    box-shadow:0 0 8px 3px rgba(139,92,246,.7);}
+          100% {opacity:0; transform:scaleY(0.15);}
+        }
+        @keyframes cut-left-kf  {0%,100%{transform:translateX(0)} 20%,80%{transform:translateX(-3px)}}
+        @keyframes cut-right-kf {0%,100%{transform:translateX(0)} 20%,80%{transform:translateX( 3px)}}
+        .eve-orbit-idle  {animation:eve-orbit-idle  2.5s ease-in-out infinite; will-change:filter;}
+        .eve-orbit-burst {animation:eve-orbit-burst 0.52s ease-out forwards;}
+        .clip-glow       {animation:clip-glow-kf 0.82s ease-in-out;}
+        .clip-fade       {animation:clip-fade-kf 1.05s ease-in-out;}
+        .clip-cut-body   {animation:cut-body-kf  0.95s ease-in-out;}
+        .cut-half-left   {animation:cut-left-kf  0.95s ease-in-out;}
+        .cut-half-right  {animation:cut-right-kf 0.95s ease-in-out;}
+        .cut-blade       {animation:cut-blade-kf 0.95s ease-in-out forwards;}
+        .hint-blink      {animation:hint-blink   1.8s ease-in-out infinite;}
       `}</style>
 
-      {/* Outer responsive wrapper */}
       <div
         ref={containerRef}
         className="relative w-full select-none"
         style={{ height: B * scale }}
       >
-        {/* Fixed 500×500 internal canvas, scaled to container width */}
         <div style={{
           position: 'absolute', top: 0, left: 0,
           width: B, height: B,
@@ -162,98 +212,94 @@ export default function EVEOrbit() {
           transform: `scale(${scale})`,
         }}>
 
-          {/* Ambient glow blob */}
+          {/* Ambient glow */}
           <div style={{
             position: 'absolute',
-            left: CX - 240, top: CY - 240,
-            width: 480, height: 480,
+            left: CX - 250, top: CY - 250,
+            width: 500, height: 500,
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(139,92,246,.2) 0%, transparent 68%)',
+            background: 'radial-gradient(ellipse, rgba(139,92,246,.16) 0%, transparent 68%)',
             pointerEvents: 'none',
-            opacity: activated ? 1 : 0.55,
+            opacity: activated ? 1 : 0.5,
             transition: 'opacity 1.2s',
           }} />
 
-          {/* Orbit ring */}
+          {/* Orbit track rings */}
           <svg style={{
             position: 'absolute', top: 0, left: 0,
             width: B, height: B, pointerEvents: 'none',
             opacity: orbitVisible ? 1 : 0,
             transition: 'opacity 1s ease',
           }}>
-            {/* Soft outer glow */}
-            <ellipse cx={CX} cy={CY} rx={RX + 1} ry={RY + 1}
-              fill="none" stroke="rgba(139,92,246,.07)" strokeWidth={8} />
-            {/* Main dashed track */}
-            <ellipse cx={CX} cy={CY} rx={RX} ry={RY}
-              fill="none"
-              stroke="rgba(139,92,246,.24)"
-              strokeWidth={1.5}
-              strokeDasharray="6 9"
-            />
+            {TRACKS.map((t, ti) => {
+              const c = ti === 0 ? '192,38,211' : ti === 1 ? '2,132,199' : '217,119,6'
+              return (
+                <g key={ti}>
+                  <ellipse cx={CX} cy={CY} rx={t.rx + 1} ry={t.ry + 1}
+                    fill="none" stroke={`rgba(${c},.06)`} strokeWidth={7} />
+                  <ellipse cx={CX} cy={CY} rx={t.rx} ry={t.ry}
+                    fill="none" stroke={`rgba(${c},.18)`}
+                    strokeWidth={1.2} strokeDasharray="5 8" />
+                </g>
+              )
+            })}
           </svg>
 
-          {/* Back clips (top arc — rendered behind robot) */}
-          {activated && back.map(({ p, i }) => (
-            <div key={`b${i}`} style={{
-              position: 'absolute',
-              left: p.x - CW / 2, top: p.y - CH / 2,
-              width: CW, height: CH,
-              transform: `scale(${ds(p.depth)})`,
-              transformOrigin: 'center',
-              zIndex: Math.round(p.y * 0.4),
-              opacity: orbitVisible ? 0.78 : 0,
-              transition: 'opacity .8s ease',
-            }}>
-              <Clip label={CLIPS[i].label} color={CLIPS[i].color} action={clipActions[i]} />
-            </div>
+          {/* Back clips (behind robot) */}
+          {activated && backClips.map(({ ti, ci, pos, action }) => (
+            <ClipBlock
+              key={`b-${ti}-${ci}`}
+              clip={TRACKS[ti].clips[ci]}
+              color={TRACKS[ti].color}
+              h={TRACKS[ti].h}
+              pos={pos}
+              action={action}
+              visible={orbitVisible}
+              zIndex={Math.round(pos.y * 0.28)}
+            />
           ))}
 
-          {/* Robot — center, z=8 so it sits between back/front clips */}
+          {/* Robot */}
           <div
             onClick={handleClick}
             style={{
               position: 'absolute',
-              left: CX - 110, top: CY - 112,
-              width: 220, height: 220,
+              left: CX - ROB / 2, top: CY - ROB / 2,
+              width: ROB, height: ROB,
               zIndex: 8,
               cursor: activated ? 'default' : 'pointer',
             }}
             className={bursting ? 'eve-orbit-burst' : 'eve-orbit-idle'}
           >
-            <Image src="/logo-icon.png" alt="E.V.E." width={220} height={220} priority />
+            <Image src="/logo-icon.png" alt="E.V.E." width={ROB} height={ROB} priority />
           </div>
 
-          {/* Front clips (bottom arc — rendered in front of robot) */}
-          {activated && front.map(({ p, i }) => (
-            <div key={`f${i}`} style={{
-              position: 'absolute',
-              left: p.x - CW / 2, top: p.y - CH / 2,
-              width: CW, height: CH,
-              transform: `scale(${ds(p.depth)})`,
-              transformOrigin: 'center',
-              zIndex: Math.round(p.y * 0.4),
-              opacity: orbitVisible ? 1 : 0,
-              transition: 'opacity .8s ease',
-            }}>
-              <Clip label={CLIPS[i].label} color={CLIPS[i].color} action={clipActions[i]} />
-            </div>
+          {/* Front clips (in front of robot) */}
+          {activated && frontClips.map(({ ti, ci, pos, action }) => (
+            <ClipBlock
+              key={`f-${ti}-${ci}`}
+              clip={TRACKS[ti].clips[ci]}
+              color={TRACKS[ti].color}
+              h={TRACKS[ti].h}
+              pos={pos}
+              action={action}
+              visible={orbitVisible}
+              zIndex={Math.round(pos.y * 0.28)}
+            />
           ))}
 
-          {/* Click hint */}
+          {/* Hint */}
           {!activated && !bursting && (
             <div className="hint-blink" style={{
               position: 'absolute',
-              left: '50%', top: CY + 134,
+              left: '50%', top: CY + 138,
               transform: 'translateX(-50%)',
               color: 'rgba(139,92,246,.85)',
-              fontSize: 11,
-              fontWeight: 700,
+              fontSize: 11, fontWeight: 700,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
-              zIndex: 20,
-              pointerEvents: 'none',
+              zIndex: 20, pointerEvents: 'none',
             }}>
               tap to activate
             </div>
@@ -265,40 +311,130 @@ export default function EVEOrbit() {
 }
 
 // ── Clip block ─────────────────────────────────────────────────────────────────
-function Clip({ label, color, action }: { label: string; color: string; action: Action }) {
+function ClipBlock({
+  clip, color, h, pos, action, visible, zIndex,
+}: {
+  clip: { label: string; w: number }
+  color: string
+  h: number
+  pos: ClipPos
+  action: Action
+  visible: boolean
+  zIndex: number
+}) {
+  const ds  = 0.70 + 0.44 * pos.depth   // depth scale
+  const op  = visible ? (0.52 + 0.48 * pos.depth) : 0
+
+  const base: React.CSSProperties = {
+    position: 'absolute',
+    left: pos.x - clip.w / 2,
+    top:  pos.y - h / 2,
+    width: clip.w,
+    height: h,
+    transform: `scale(${ds})`,
+    transformOrigin: 'center',
+    zIndex,
+    opacity: op,
+    transition: 'opacity .8s ease',
+    borderRadius: 3,
+    overflow: 'visible',
+  }
+
+  if (action === 'cut') {
+    const hw = (clip.w - 3) / 2
+    return (
+      <div style={base}>
+        {/* Left half */}
+        <div className="cut-half-left" style={{
+          position: 'absolute', left: 0, top: 0,
+          width: hw, height: h,
+          background: 'rgba(9,9,16,.95)',
+          borderLeft: `3px solid ${color}`,
+          borderTop: `1px solid ${color}28`,
+          borderBottom: `1px solid ${color}18`,
+          borderRadius: '3px 0 0 3px',
+          overflow: 'hidden',
+        }}>
+          <div style={{ height: 6, background: color, opacity: .85 }} />
+          <Waveform color={color} count={6} />
+        </div>
+
+        {/* Purple cut blade */}
+        <div className="cut-blade" style={{
+          position: 'absolute',
+          left: hw - 0.5, top: -6,
+          width: 3, height: h + 12,
+          background: 'linear-gradient(180deg, rgba(139,92,246,0) 0%, #7c3aed 20%, #a78bfa 50%, #7c3aed 80%, rgba(139,92,246,0) 100%)',
+          borderRadius: 2,
+          zIndex: 2,
+        }} />
+
+        {/* Right half */}
+        <div className="cut-half-right" style={{
+          position: 'absolute', left: hw + 3, top: 0,
+          width: hw, height: h,
+          background: 'rgba(9,9,16,.95)',
+          borderRight: `1px solid ${color}18`,
+          borderTop: `1px solid ${color}28`,
+          borderBottom: `1px solid ${color}18`,
+          borderRadius: '0 3px 3px 0',
+          overflow: 'hidden',
+        }}>
+          <div style={{ height: 6, background: color, opacity: .55 }} />
+          <Waveform color={color} count={6} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
-      className={
-        action === 'glow' ? 'clip-glow' :
-        action === 'cut'  ? 'clip-cut'  :
-        action === 'fade' ? 'clip-fade' : ''
-      }
+      className={action === 'glow' ? 'clip-glow' : action === 'fade' ? 'clip-fade' : ''}
       style={{
-        width: '100%', height: '100%',
-        background: 'rgba(10,10,18,.94)',
-        border: `1px solid ${color}40`,
+        ...base,
+        background: 'rgba(9,9,16,.95)',
+        border: `1px solid ${color}28`,
         borderLeft: `3px solid ${color}`,
-        borderRadius: 4,
-        display: 'flex', alignItems: 'center',
-        paddingLeft: 7, paddingRight: 5,
         overflow: 'hidden',
       }}
     >
+      {/* Color header bar */}
+      <div style={{ height: 6, background: color, opacity: .82 }} />
+      {/* Label + waveform row */}
       <div style={{
-        width: 5, height: 5, borderRadius: '50%',
-        background: color, marginRight: 5, flexShrink: 0, opacity: .9,
-      }} />
-      <span style={{
-        color: 'rgba(255,255,255,.58)',
-        fontSize: 9,
-        fontFamily: 'monospace',
-        whiteSpace: 'nowrap',
+        display: 'flex', alignItems: 'center',
+        paddingLeft: 5, height: h - 6, gap: 5,
         overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        letterSpacing: '.02em',
       }}>
-        {label}
-      </span>
+        <span style={{
+          color: 'rgba(255,255,255,.48)',
+          fontSize: 8, fontFamily: 'monospace',
+          whiteSpace: 'nowrap', letterSpacing: '.02em', flexShrink: 0,
+        }}>
+          {clip.label}
+        </span>
+        <Waveform color={color} count={9} inline />
+      </div>
+    </div>
+  )
+}
+
+// Mini waveform bars
+function Waveform({ color, count, inline }: { color: string; count: number; inline?: boolean }) {
+  const hs = [5, 9, 6, 11, 8, 7, 10, 5, 9, 7, 6, 8].slice(0, count)
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 1.5,
+      opacity: .3, flexShrink: 0,
+      ...(inline ? {} : { padding: '2px 4px' }),
+    }}>
+      {hs.map((h, i) => (
+        <div key={i} style={{
+          width: 1.5, height: h,
+          background: color,
+          borderRadius: 1,
+        }} />
+      ))}
     </div>
   )
 }
