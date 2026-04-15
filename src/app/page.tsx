@@ -495,8 +495,6 @@ function PluginCard({ number, title, description, accent }: { number: string; ti
 }
 
 function ChangelogSection() {
-  const [expanded, setExpanded] = useState(false)
-
   return (
     <section className="max-w-3xl mx-auto px-6 mb-24">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -520,33 +518,6 @@ function ChangelogSection() {
           ]}
         />
 
-        {expanded && (
-          <>
-            <ChangelogEntry
-              date="March 2026"
-              items={[
-                { type: 'NEW',      text: 'Script import with PDF upload — extract text from any PDF and import as a script' },
-                { type: 'IMPROVED', text: 'VIBE analysis notes and virality scoring shown after every script generation' },
-              ]}
-            />
-            <ChangelogEntry
-              date="February 2026"
-              items={[
-                { type: 'NEW', text: 'E.V.E. Studio beta launch — script generation with VIBE' },
-                { type: 'NEW', text: 'Client themes system — build deep brand profiles that VIBE uses for every script' },
-                { type: 'NEW', text: 'Script editing, restore, and client sharing via link' },
-                { type: 'NEW', text: 'Premiere Pro plugin with Deep Scan, Auto-Edit, and in-timeline script panel' },
-              ]}
-            />
-          </>
-        )}
-
-        <button
-          onClick={() => setExpanded(e => !e)}
-          className="w-full py-3 text-zinc-600 hover:text-zinc-400 transition text-sm font-medium"
-        >
-          {expanded ? '↑ Collapse' : '↓ View full changelog'}
-        </button>
       </div>
     </section>
   )
