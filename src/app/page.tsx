@@ -259,8 +259,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* What's New */}
-      <ChangelogSection />
 
       {/* Beta */}
       <BetaSection />
@@ -494,66 +492,6 @@ function PluginCard({ number, title, description, accent }: { number: string; ti
   )
 }
 
-function ChangelogSection() {
-  return (
-    <section className="max-w-3xl mx-auto px-6 mb-24">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div>
-          <p className="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-1">Product Updates</p>
-          <h2 className="text-2xl font-bold">What&apos;s New in E.V.E.</h2>
-        </div>
-        <span className="inline-flex items-center gap-1.5 bg-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide w-fit">
-          ✦ See What&apos;s New
-        </span>
-      </div>
-
-      <div className="space-y-4">
-        <ChangelogEntry
-          date="April 2026"
-          badge="Latest"
-          items={[
-            { type: 'NEW',      text: 'Bulk script import — paste multiple scripts separated by --- and import them all at once with live progress' },
-            { type: 'NEW',      text: 'Import Client tab — paste any client notes, emails, or form responses and VIBE extracts their theme automatically' },
-            { type: 'IMPROVED', text: 'Plugin features section — Deep Scan, Auto-Edit, and Scripts in Panel now highlighted with full descriptions' },
-          ]}
-        />
-
-      </div>
-    </section>
-  )
-}
-
-function ChangelogEntry({
-  date, badge, items,
-}: {
-  date: string
-  badge?: string
-  items: { type: 'NEW' | 'IMPROVED' | 'FIXED'; text: string }[]
-}) {
-  const pill: Record<string, string> = {
-    NEW:      'bg-violet-900/40 text-violet-300',
-    IMPROVED: 'bg-blue-900/40 text-blue-300',
-    FIXED:    'bg-emerald-900/40 text-emerald-300',
-  }
-  return (
-    <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-      <div className="flex items-center gap-3 mb-5">
-        <span className="text-white font-semibold">{date}</span>
-        {badge && <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full font-bold">{badge}</span>}
-      </div>
-      <div className="space-y-2.5">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-start gap-3 text-sm">
-            <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wide shrink-0 mt-0.5 ${pill[item.type]}`}>
-              {item.type}
-            </span>
-            <span className="text-zinc-400 leading-relaxed">{item.text}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function Step({ number, title, description }: { number: string; title: string; description: string }) {
   return (
