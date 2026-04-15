@@ -34,7 +34,7 @@ export default function EVEOrbit() {
   const rafRef         = useRef<number | null>(null)
   const actionTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const [scale, setScale]             = useState<number | null>(null)
+  const [scale, setScale]             = useState<number>(0.6)
   const [activated, setActivated]     = useState(false)
   const [bursting, setBursting]       = useState(false)
   const [orbitVisible, setOrbitVisible] = useState(false)
@@ -51,7 +51,10 @@ export default function EVEOrbit() {
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
-    const ro = new ResizeObserver(([e]) => setScale(e.contentRect.width / B))
+    const ro = new ResizeObserver(([e]) => {
+      const w = e.contentRect.width
+      if (w > 0) setScale(w / B)
+    })
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
@@ -119,11 +122,6 @@ export default function EVEOrbit() {
   const ds = (depth: number) => 0.78 + 0.38 * depth  // depth → scale multiplier
   const back  = positions.map((p, i) => ({ p, i })).filter(({ p }) => p.y <  CY)
   const front = positions.map((p, i) => ({ p, i })).filter(({ p }) => p.y >= CY)
-
-  // Don't render until we know container width (prevents SSR layout shift)
-  if (scale === null) {
-    return <div ref={containerRef} style={{ width: '100%', minHeight: 320 }} />
-  }
 
   return (
     <>
