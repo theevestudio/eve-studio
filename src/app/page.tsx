@@ -516,7 +516,6 @@ function ChangelogSection() {
           items={[
             { type: 'NEW',      text: 'Bulk script import — paste multiple scripts separated by --- and import them all at once with live progress' },
             { type: 'NEW',      text: 'Import Client tab — paste any notes, emails, or form responses and VIBE extracts the client theme automatically' },
-            { type: 'NEW',      text: 'E.V.E. robot head favicon — shows in all browser tabs, bookmarks, and iPhone home screen' },
             { type: 'IMPROVED', text: 'NDA approval email now sends from noreply@theevestudio.io with links that open correctly in all browsers' },
             { type: 'FIXED',    text: 'NDA signing link showing "expired" even when token was brand new' },
             { type: 'FIXED',    text: 'Resend NDA button silently doing nothing when the API call failed' },
